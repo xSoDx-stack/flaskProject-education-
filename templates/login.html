@@ -1,23 +1,28 @@
 {% extends "base.html" %}
+
 {% block title %}Вход{% endblock %}
 
 {% block body %}
-    <div class="container">
-        <form>
-            <div class="col-sm-7">
-                <label for="exampleInputEmail1" class="form-label">{{ login.email.label }}</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                <div id="emailHelp" class="form-text">Введите вашу почту.</div>
-            </div>
-            <div class="col-sm-7">
-                <label for="exampleInputPassword1" class="form-label">{{ login.password.label }}</label>
-                <input type="password" class="form-control" id="exampleInputPassword1">
-            </div>
-            <div class="col-sm-7 form-check">
-                <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">{{ login.checkbox.label }}</label>
-            </div>
-            <button type="submit" class="col-sm-7 btn btn-primary">{{ login.submit.label }}</button>
-        </form>
-    </div>
+
+    <form class="position-absolute top-50 start-50 translate-middle w-25 p-3">
+        <figure class="text-center">
+            <p class="h1">Вход</p>
+        </figure>
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">{{ login.email.label }}</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+            <div id="emailHelp" class="form-text">Введите ваш адрес электронной почты.</div>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">{{ login.password.label }}</label>
+            <input type="password" class="form-control" id="exampleInputPassword1">
+            <div id="passwordHelpInline" class="form-text"><a href="#" class="alert-link">Забыли пароль ?</a></div>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="exampleCheck1">
+            <label class="form-check-label" for="exampleCheck1">{{ login.checkbox.label }}</label>
+        </div>
+        <button type="submit" class="btn btn-outline-success me-2">{{ login.submit.label }}</button>
+    </form>
+
 {% endblock %}
