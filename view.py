@@ -1,10 +1,11 @@
 from main import app
-from flask import render_template
+from flask import render_template, redirect, url_for, session
 from form import LogIn
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 
 @app.errorhandler(404)
@@ -22,9 +23,13 @@ def user(name):
     return render_template('user.html', name=name)
 
 
-@app.route('/login' )
+@app.route('/login', methods = ['GET', 'POST'])
 def login():
     login = LogIn()
-    return render_template('login.html', login=login)
+    name = None
+    if login.validate_on_submit():
+        session['name'] = login.email.data
+        return  redirect(url_for('index'))
+    return render_template('login.html', login=login, name=session.get('name'))
 
 
