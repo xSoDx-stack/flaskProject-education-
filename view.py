@@ -1,6 +1,6 @@
 from main import app
 from flask import render_template, redirect, url_for, session
-from form import LogIn
+from form import LogIn, Registr
 
 @app.route('/')
 def index():
@@ -31,5 +31,13 @@ def login():
         session['name'] = login.email.data
         return  redirect(url_for('index'))
     return render_template('login.html', login=login, name=session.get('name'))
+
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+    register = Registr()
+    if register.validate_on_submit():
+        return redirect(url_for('index'))
+    return render_template('registration.html', register=register)
+
 
 
