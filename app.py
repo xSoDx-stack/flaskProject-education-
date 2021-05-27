@@ -1,10 +1,10 @@
 from flask import Flask
-from os import getenv
-from sys import  exit
+from cfg import Configuration
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-secret_key = getenv('SECRET_KEY')
-app.config['SECRET_KEY'] = secret_key
+app.config.from_object(Configuration)
+db = SQLAlchemy(app)
 
 
 
