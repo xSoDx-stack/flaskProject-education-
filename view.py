@@ -1,6 +1,8 @@
 from main import app
-from flask import render_template, redirect, url_for, session
+from app import db
+from flask import render_template, redirect, url_for, session, request
 from form import LogIn, Registr
+from model import Role, User
 
 @app.route('/')
 def index():
@@ -36,7 +38,22 @@ def login():
 def register():
     register = Registr()
     if register.validate_on_submit():
-        return redirect(url_for('index'))
+        user = User.query.filter_by(email=register.email.data).first()
+        if user is None:
+            user = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=register.password.data)
+            db.session.add(user)
+            session['known'] = False
+            db.session.commit()
+            print('Выполнилось')
+        else:
+            session['known'] = True
+            session['email'] = register.email.data
+            session['name'] = register.name.data
+            session['surname'] = register.surname.data
+            register.email.data = ''
+            print('Ошибка')
+            return redirect(url_for('register'))
+
     return render_template('registration.html', register=register)
 
 
