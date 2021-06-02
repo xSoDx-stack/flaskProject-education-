@@ -3,6 +3,8 @@ from app import db
 from flask import render_template, redirect, url_for, session, request
 from form import LogIn, Registr
 from model import Role, User
+from passlib.apps import custom_app_context as pwd_context
+
 
 @app.route('/')
 def index():
@@ -36,25 +38,18 @@ def login():
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
+    errors = False
     register = Registr()
     if register.validate_on_submit():
         user = User.query.filter_by(email=register.email.data).first()
         if user is None:
-            user = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=register.password.data)
+            password = pwd_context.hash(register.password.data)
+            user = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=password)
             db.session.add(user)
-            session['known'] = False
             db.session.commit()
-            print('Выполнилось')
         else:
-            session['known'] = True
-            session['email'] = register.email.data
-            session['name'] = register.name.data
-            session['surname'] = register.surname.data
-            register.email.data = ''
-            print('Ошибка')
-            return redirect(url_for('register'))
-
-    return render_template('registration.html', register=register)
+            errors = True
+    return render_template('registration.html', register=register, errors=errors)
 
 
 
