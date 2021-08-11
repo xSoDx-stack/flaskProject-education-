@@ -1,4 +1,9 @@
-from app import db
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash,generate_password_hash
+
+
+db = SQLAlchemy()
+
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -15,8 +20,22 @@ class User(db.Model):
     email = db.Column(db.String, unique=True)
     name = db.Column(db.String(64), nullable=False)
     surname = db.Column(db.String(64), nullable=True)
-    password = db.Column(db.Text)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    password_hash = db.Column(db.Text)
+
+    @property
+    def password(self):
+        raise AttributeError('Запрещенн доступ к паролю')
+
+
+    @password.setter
+    def password_hash(self, password):
+        self.password_hesh = generate_password_hash(password)
+
+
+    def password_valid(self, password):
+      return check_password_hash(self.password_hash, password)
+
 
     def __repr__(self):
         return '<User %r>' % self.email

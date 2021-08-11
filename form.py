@@ -16,8 +16,3 @@ class Registr(FlaskForm):
    password = PasswordField('Новый пароль', validators=[InputRequired()])
    password2 = PasswordField('Повторите пароль', validators=[InputRequired(), EqualTo('password', 'Пароли не совпадают')])
    submit = SubmitField('Регистрация')
-
-
-
-
-

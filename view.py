@@ -1,15 +1,15 @@
-from main import app
-from app import db
-from flask import render_template, redirect, url_for, session, request
-from form import LogIn, Registr
-from model import Role, User
+from flask import render_template, redirect, url_for, session
 from passlib.apps import custom_app_context as pwd_context
+
+from app import db
+from form import LogIn, Registr
+from main import app
+from models import User
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
-
 
 
 @app.errorhandler(404)
@@ -27,7 +27,7 @@ def user(name):
     return render_template('user.html', name=name)
 
 
-@app.route('/login', methods = ['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     login = LogIn()
     name = None
@@ -35,6 +35,7 @@ def login():
         session['name'] = login.email.data
         return  redirect(url_for('index'))
     return render_template('login.html', login=login, name=session.get('name'))
+
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
@@ -50,6 +51,3 @@ def register():
         else:
             errors = True
     return render_template('registration.html', register=register, errors=errors)
-
-
-
