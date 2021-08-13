@@ -1,10 +1,8 @@
 from flask import render_template, redirect, url_for, session
-from passlib.apps import custom_app_context as pwd_context
-
-from app import db
-from form import LogIn, Registr
-from main import app
-from models import User
+from werkzeug.security import generate_password_hash
+from shop.form import LogIn, Registr
+from shop import app, db
+from shop.models import User
 
 
 @app.route('/')
@@ -44,7 +42,7 @@ def register():
     if register.validate_on_submit():
         user = User.query.filter_by(email=register.email.data).first()
         if user is None:
-            password = pwd_context.hash(register.password.data)
+            password = generate_password_hash(register.password.data)
             user = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=password)
             db.session.add(user)
             db.session.commit()
