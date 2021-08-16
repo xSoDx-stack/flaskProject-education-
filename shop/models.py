@@ -29,7 +29,7 @@ class User(db.Model):
 
 
     @password.setter
-    def password_hash(self, password):
+    def password(self, password):
         self.password_hesh = generate_password_hash(password)
 
 
