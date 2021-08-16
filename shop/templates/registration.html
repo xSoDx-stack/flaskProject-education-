@@ -9,25 +9,25 @@
         {{ register.csrf_token }}
         <div class="p-3 mb-2 bg-dark bg-gradient">
             <div class="mb-3">
-                <label class="form-label ">Введите активную электронную почту</label>
+                {{ register.email.label (class_="form-label") }}
                 {{ register.email(class="form-control") }}
                 <div id="emailHelp" class="form-text">{% if errors %}
                     <div class="text-danger">Пользователь с таким почтовым ящиком зарегестрирован{% endif %}</div>
             </div>
             <div class="mb-3">
-                <label class="form-label ">Введите ваше имя</label>
+                {{ register.name.label (class_="form-label") }}
                 {{ register.name(class="form-control") }}
             </div>
             <div class="mb-3">
-                <label class="form-label ">Введите вашу фамилию</label>
+                {{ register.surname.label (class_="form-label") }}
                 {{ register.surname(class="form-control") }}
             </div>
             <div class="mb-2">
-                <label class="form-label ">Придумайте пароль</label>
+                {{ register.password.label (class_="form-label") }}
                 {{ register.password(class="form-control") }}
             </div>
             <div class="mb-3">
-                <label class="form-label">Повторите пароль</label>
+                {{ register.password2.label (class_="form-label") }}
                 {{ register.password2(class="form-control") }}
                 <div id="emailHelp" class="form-text">
                     {% if register.password2.errors %}

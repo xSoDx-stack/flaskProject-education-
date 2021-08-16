@@ -15,6 +15,6 @@ class Registr(FlaskForm):
    email = StringField('Введите действующую электронную почту', validators=[Email('Неправильный электронный адрес'),DataRequired()])
    name = StringField('Введите ваше имя', validators=[InputRequired()])
    surname = StringField('Введите вашу фамилию', validators=[InputRequired()])
-   password = PasswordField('Новый пароль', validators=[InputRequired()])
+   password = PasswordField('Придумайте пароль', validators=[InputRequired()])
    password2 = PasswordField('Повторите пароль', validators=[InputRequired(), EqualTo('password', 'Пароли не совпадают')])
    submit = SubmitField('Регистрация')
