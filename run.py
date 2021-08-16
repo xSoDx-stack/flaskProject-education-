@@ -1,5 +1,5 @@
-import shop
+from shop import app
 
 if __name__=="__main__":
-    shop.app.run()
+    app.run()
 
