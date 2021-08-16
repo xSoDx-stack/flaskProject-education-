@@ -13,28 +13,29 @@
                 {{ register.email(class="form-control") }}
                 <div id="emailHelp" class="form-text">{% if errors %}
                     <div class="text-danger">Пользователь с таким почтовым ящиком зарегестрирован{% endif %}</div>
-            </div>
-            <div class="mb-3">
-                {{ register.name.label (class_="form-label") }}
-                {{ register.name(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ register.surname.label (class_="form-label") }}
-                {{ register.surname(class="form-control") }}
-            </div>
-            <div class="mb-2">
-                {{ register.password.label (class_="form-label") }}
-                {{ register.password(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ register.password2.label (class_="form-label") }}
-                {{ register.password2(class="form-control") }}
-                <div id="emailHelp" class="form-text">
-                    {% if register.password2.errors %}
-                        <div class="text-danger">Пароли не совпадают</div>{% else %}{% endif %}
                 </div>
+                <div class="mb-3">
+                    {{ register.name.label (class_="form-label") }}
+                    {{ register.name(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ register.surname.label (class_="form-label") }}
+                    {{ register.surname(class="form-control") }}
+                </div>
+                <div class="mb-2">
+                    {{ register.password.label (class_="form-label") }}
+                    {{ register.password(class="form-control") }}
+                </div>
+                <div class="mb-3">
+                    {{ register.password2.label (class_="form-label") }}
+                    {{ register.password2(class="form-control") }}
+                    <div id="emailHelp" class="form-text">
+                        {% if register.password2.errors %}
+                            <div class="text-danger">Пароли не совпадают</div>{% else %}{% endif %}
+                    </div>
+                </div>
+                {{ register.submit(class="btn btn-success") }} {# Регистрация #}
             </div>
-            {{ register.submit(class="btn btn-success") }} {# Регистрация #}
         </div>
     </form>
 
