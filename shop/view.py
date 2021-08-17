@@ -35,15 +35,14 @@ def login():
     return render_template('login.html', login=login, name=session.get('name'))
 
 
-@app.route('/register', methods = ['GET', 'POST'])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     errors = False
     register = Registr()
     if register.validate_on_submit():
         user = User.query.filter_by(email=register.email.data).first()
         if user is None:
-            password = generate_password_hash(register.password.data)
-            user = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=password)
+            user = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=register.password2.data)
             db.session.add(user)
             db.session.commit()
         else:
