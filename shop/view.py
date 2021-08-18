@@ -45,6 +45,7 @@ def register():
             user = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=register.password2.data)
             db.session.add(user)
             db.session.commit()
+            return redirect(url_for('index'))
         else:
             errors = True
     return render_template('registration.html', register=register, errors=errors)
