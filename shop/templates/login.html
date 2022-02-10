@@ -22,9 +22,6 @@
                     <a href="#" class="link-secondary">Забыли пароль ?</a>
                 </div>
             </div>
-            <div class="mb-3 form-check">
-{#                {{ login.checkbox(class="form-check-input") }} {{ login.checkbox.label(class="form-check-label") }}#}
-            </div>
             {{ login.submit(class="btn btn-success") }} {# Войти #}
             <a class="position-end text-light " href="{{ url_for('register') }}">Регистрация</a>
         </div>

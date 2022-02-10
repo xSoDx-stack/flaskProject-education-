@@ -55,12 +55,12 @@ def register():
     errors = False
     register = Registr()
     if register.validate_on_submit():
-        user = User.query.filter_by(email=register.email.data).first()
-        if user is None:
-            user = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=register.password2.data)
+        users = User.query.filter_by(email=register.email.data).first()
+        if users is None:
+            users = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=register.password2.data)
             db.session.add(user)
             db.session.commit()
             return redirect(url_for('index'))
         else:
             errors = True
-    return render_template('registration.html', register=register, errors=errors)
+    return render_template('registration.html', register=register)

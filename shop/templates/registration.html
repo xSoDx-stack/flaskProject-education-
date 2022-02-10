@@ -5,36 +5,15 @@
 {% block body %}
     <form method="POST"
           class="position-absolute top-50 start-50 translate-middle w-25 p-3 text-white border bg-dark bg-gradient">
-        {{ register.csrf_token }}
-        <div class="mb-3">
-            {{ register.email.label (class_="form-label") }}
-            {{ register.email(class_="form-control") }}
-            <div class="form-text">
-                {% if errors %}
-                    <div class="text-danger">Пользователь с таким почтовым ящиком зарегестрирован
-                {% elif register.email.errors %}
-                    <div class="text-danger">
-                    {% for i in register.email.errors %}{{ i }}
-                    {% endfor %}
-                {% endif %}</div></div>
-            </div>
-        </div>
-        <div class="mb-3">
-            {{ register.name.label (class_="form-label") }}
-            {{ register.name(class="form-control") }}</div>
-        <div class="mb-3">
-            {{ register.surname.label (class_="form-label") }}
-            {{ register.surname(class="form-control") }}</div>
-        <div class="mb-2">
-            {{ register.password.label (class_="form-label") }}
-            {{ register.password(class="form-control") }}</div>
-        <div class="mb-3">
-            {{ register.password2.label (class_="form-label") }}
-            {{ register.password2(class="form-control") }}
-            <div id="emailHelp" class="form-text">{% if register.password2.errors %}
-                <div class="text-danger">{% for i in register.password2.errors %}{{ i }}{% endfor %}{% endif %}</div>
-            </div>
-        </div>
-        {{ register.submit(class="btn btn-success") }} {# Регистрация #}
+{#        {{ register.csrf_token }}#}
+    <div class="mb-3">
+           {% for i in register if i.name != 'csrf_token'  %}
+               {{ i.label() }}
+               {{ i  (class_="form-control") }}
+               {% for error in i.errors %}
+                   <div class="text-danger">{{ error }}</div>
+               {% endfor %}
+           {% endfor %}
+    </div>
     </form>
 {% endblock %}
