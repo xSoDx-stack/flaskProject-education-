@@ -1,5 +1,4 @@
 from flask import render_template, redirect, url_for, session, request
-from werkzeug.security import generate_password_hash
 from shop.form import LogIn, Registr
 from shop import app, db
 from shop.models import User
@@ -24,7 +23,7 @@ def server_not_found(e):
 
 
 @app.route('/user/<name>')
-def user(name):
+def user():
     user = User.query.filter(User.id == session['user_id'])
     return render_template('user.html', name=user)
 
@@ -40,27 +39,25 @@ def login():
         if not login.validate_on_submit():
             return render_template('login.html', login=login)
 
-        user = User.query.filter(User.email==login.email.data).first()
+        user = User.query.filter(User.email == login.email.data).first()
         if not user or user.pasword_validation(login.password.data):
-            login.email.errors.append("Неверное имя или пароль")
+            login.email.errors.append('Неверное имя или пароль')
         else:
             session['user_id'] = user.id
-            session[email] = email
+            session['email'] = login.email
             return redirect('/user')
-    return render_template('login.html',login=login)
+    return render_template('login.html', login=login)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    errors = False
     register = Registr()
     if register.validate_on_submit():
         users = User.query.filter_by(email=register.email.data).first()
         if users is None:
-            users = User(email=register.email.data, name=register.name.data, surname=register.surname.data, password=register.password2.data)
-            db.session.add(user)
+            users = User(email=register.email.data, name=register.name.data, surname=register.surname.data,
+                         password=register.password2.data)
+            db.session.add(users)
             db.session.commit()
             return redirect(url_for('index'))
-        else:
-            errors = True
     return render_template('registration.html', register=register)
