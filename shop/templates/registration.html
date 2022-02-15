@@ -3,21 +3,21 @@
 {% block title %}Регистрация{% endblock %}
 
 {% block body %}
-    <form method="POST"
-          class="position-absolute top-50 start-50 translate-middle w-25 p-3 text-white border bg-dark bg-gradient">
-{#       {{ register.csrf_token }}#}
-        <div class="mb-3">
-            {% for i in register if i.name != 'csrf_token'  %}
-                {% if i.name != 'submit' %}
-                    {{ i.label }}
-                {% else %}
-                    {{ "---------------------------------------------------------------------" }}
-                {% endif %}
-                {{ i  (class_="form-control") }}
-                {% for error in i.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            {% endfor %}
-        </div>
-    </form>
+<form method="POST"
+      class="position-absolute top-50 start-50 translate-middle w-25 p-3 text-white border bg-dark bg-gradient">
+    {{ register.csrf_token }}
+    <div class="mb-3">
+        {% for i in register if i.name != 'csrf_token'  %}
+        {% if i.name != 'submit' %}
+        {{ i.label }}
+        {% else %}
+        {{ "---------------------------------------------------------------------" }}
+        {% endif %}
+        {{ i  (class_="form-control") }}
+        {% for error in i.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+        {% endfor %}
+    </div>
+</form>
 {% endblock %}

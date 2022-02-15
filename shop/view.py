@@ -60,4 +60,7 @@ def register():
             db.session.add(users)
             db.session.commit()
             return redirect(url_for('index'))
+        else:
+            register.email.errors = ['Пользователь с такой почтой уже зарегестрирован']
+
     return render_template('registration.html', register=register)

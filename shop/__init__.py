@@ -10,5 +10,3 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 from shop.view import *
-
-

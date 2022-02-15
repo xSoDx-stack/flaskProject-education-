@@ -1,4 +1,4 @@
-from werkzeug.security import check_password_hash,generate_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from shop import db
 
 
@@ -10,6 +10,7 @@ class Role(db.Model):
 
     def __repr__(self):
         return '<Role %r>' % self.name
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -30,4 +31,3 @@ class User(db.Model):
 
     def pasword_validation(self, password):
         return check_password_hash(self.password_hash, password)
-

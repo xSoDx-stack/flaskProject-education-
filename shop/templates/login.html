@@ -4,27 +4,27 @@
 
 {% block body %}
 
-    <form method="POST"
-          class="position-absolute top-50 start-50 translate-middle w-25 p-3 text-white border border-dark bg-gradient">
-        {{ login.csrf_token }}
-        <div class="p-3 mb-2 bg-dark bg-gradient">
-            <div class="mb-3">
-                {{ login.email.label (class_="form-label") }}
-                {{ login.email(class="form-control") }}
-                <div id="emailHelp" class="form-text">{% if login.email.errors %}
-                    <div class="text-danger">{{ login.email.errors }}</div>{% else %}Введите ваш адрес
-                    электронной почты.{% endif %}</div>
-            </div>
-            <div class="mb-3">
-                {{ login.password.label (class_="form-label") }}
-                {{ login.password(class="form-control") }}
-                <div id="passwordHelpInline" class="form-text">
-                    <a href="#" class="link-secondary">Забыли пароль ?</a>
-                </div>
-            </div>
-            {{ login.submit(class="btn btn-success") }} {# Войти #}
-            <a class="position-end text-light " href="{{ url_for('register') }}">Регистрация</a>
+<form method="POST"
+      class="position-absolute top-50 start-50 translate-middle w-25 p-3 text-white border border-dark bg-gradient">
+    {{ login.csrf_token }}
+    <div class="p-3 mb-2 bg-dark bg-gradient">
+        <div class="mb-3">
+            {{ login.email.label (class_="form-label") }}
+            {{ login.email(class="form-control") }}
+            <div id="emailHelp" class="form-text">{% if login.email.errors %}
+                <div class="text-danger">{{ login.email.errors }}</div>{% else %}Введите ваш адрес
+                электронной почты.{% endif %}</div>
         </div>
-    </form>
+        <div class="mb-3">
+            {{ login.password.label (class_="form-label") }}
+            {{ login.password(class="form-control") }}
+            <div id="passwordHelpInline" class="form-text">
+                <a href="#" class="link-secondary">Забыли пароль ?</a>
+            </div>
+        </div>
+        {{ login.submit(class="btn btn-success") }} {# Войти #}
+        <a class="position-end text-light " href="{{ url_for('register') }}">Регистрация</a>
+    </div>
+</form>
 
 {% endblock %}
