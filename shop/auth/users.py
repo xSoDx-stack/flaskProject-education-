@@ -6,7 +6,7 @@ from . import auth
 from .email import send_password_reset_email
 
 
-@auth.route('/auth/<name>')
+@auth.route('/user/<name>')
 def user():
     user = User.query.filter(User.id == session['user_id'])
     return render_template('auth/user.html', name=user)
@@ -22,7 +22,7 @@ def login():
             return render_template('auth/login.html', login=login)
         user = User.query.filter(User.email == login.email.data).first()
         if not user or user.pasword_validation(login.password.data):
-            login.email.errors.append('Неверное имя или пароль')
+            login.email.errors = ['Неверное имя или пароль']
         else:
             session['user_id'] = user.id
             session['email'] = login.email
