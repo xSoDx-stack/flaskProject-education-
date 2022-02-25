@@ -1,4 +1,4 @@
-from os import getenv, environ
+from os import getenv
 
 
 class Configuration:
@@ -14,5 +14,5 @@ class Configuration:
     MAIL_USE_SSL = False
     MAIL_USE_TLS = True
     MAIL_DEBUG = True
-    MAIL_USERNAME = environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = environ.get('MAIL_PASSWORD')
+    MAIL_USERNAME = getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = getenv('MAIL_PASSWORD')
