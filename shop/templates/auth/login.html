@@ -19,7 +19,7 @@
             {{ login.password.label (class_="form-label") }}
             {{ login.password(class="form-control") }}
             <div id="passwordHelpInline" class="form-text">
-                <a href="#" class="link-secondary">Забыли пароль ?</a>
+                <a href="{{ url_for('auth.send_password_reset')}}" class="link-secondary">Забыли пароль ?</a>
             </div>
         </div>
         {{ login.submit(class="btn btn-success") }} {# Войти #}
