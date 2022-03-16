@@ -9,16 +9,16 @@ from .email import send_password_reset_email
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     _register = Registr()
-    if register.validate_on_submit():
-        users = User.query.filter_by(email=register.email.data).first()
-        if users is None:
+    if _register.validate_on_submit():
+        users = User.query.filter_by(email=_register.email.data).first()
+        if not users:
             users = User(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
                          password=_register.password2.data)
             db.session.add(users)
             db.session.commit()
             return redirect(url_for('index'))
         else:
-            register.email.errors = ['Пользователь с такой почтой уже зарегистрирован']
+            _register.email.errors = ['Пользователь с такой почтой уже зарегистрирован']
     return render_template('auth/registration.html', register=_register)
 
 
@@ -28,22 +28,22 @@ def login():
     if session.get('user_id'):
         return redirect(url_for('auth.my'))
     else:
-        login = LogIn()
+        _login = LogIn()
         if request.method == 'POST':
 
-            if login.validate_on_submit():
-                user = User.query.filter(User.email == login.email.data).first()
+            if _login.validate_on_submit():
+                user = User.query.filter(User.email == _login.email.data).first()
                 if user:
-                    if user.password_validation(login.password.data):
+                    if user.password_validation(_login.password.data):
                         session['user_id'] = user.id
                         session['email'] = user.email
                         session['name'] = user.name
                         return redirect(url_for('auth.my'))
                     else:
-                        login.email.errors = 'Неверно введена почта или пароль'
+                        _login.email.errors = 'Неверно введена почта или пароль'
                 else:
-                    login.email.errors = 'Неверно введена почта или пароль'
-        return render_template('auth/login.html', login=login)
+                    _login.email.errors = 'Неверно введена почта или пароль'
+        return render_template('auth/login.html', login=_login)
 
 
 @auth.route('/main/my')
