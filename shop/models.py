@@ -32,7 +32,7 @@ class User(shop.db.Model):
     def password(self, password):
         self.password_hash = generate_password_hash(password)
 
-    def pasword_validation(self, password):
+    def password_validation(self, password):
         return check_password_hash(self.password_hash, password)
 
     def get_reset_password_token(self, expires_in=600):
