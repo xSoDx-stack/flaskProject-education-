@@ -1,3 +1,6 @@
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
+
 from werkzeug.security import check_password_hash, generate_password_hash
 import jwt
 from time import time
@@ -7,7 +10,7 @@ from os import getenv
 
 class Role(shop.db.Model):
     __tablename__ = 'roles'
-    id = shop.db.Column(shop.db.Integer, primary_key=True)
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = shop.db.Column(shop.db.String, unique=True)
     users = shop.db.relationship('User', backref='role', lazy='dynamic')
 
@@ -17,12 +20,12 @@ class Role(shop.db.Model):
 
 class User(shop.db.Model):
     __tablename__ = 'users'
-    id = shop.db.Column(shop.db.Integer, primary_key=True)
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = shop.db.Column(shop.db.String, unique=True)
     name = shop.db.Column(shop.db.String(64), nullable=False)
     surname = shop.db.Column(shop.db.String(64), nullable=True)
     password_hash = shop.db.Column(shop.db.Text())
-    role_id = shop.db.Column(shop.db.Integer, shop.db.ForeignKey('roles.id'))
+    role_id = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('roles.id'))
 
     @property
     def password(self):
