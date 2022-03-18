@@ -21,10 +21,12 @@ class Role(shop.db.Model):
 class User(shop.db.Model):
     __tablename__ = 'users'
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email = shop.db.Column(shop.db.String, unique=True)
+    email = shop.db.Column(shop.db.String, unique=False)
     name = shop.db.Column(shop.db.String(64), nullable=False)
     surname = shop.db.Column(shop.db.String(64), nullable=True)
     password_hash = shop.db.Column(shop.db.Text())
+    illegal_login_attempts = shop.db.Column(shop.db.Integer, nullable=True)
+    account_status = shop.db.Column(shop.db.String(64), nullable=True)
     role_id = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('roles.id'))
 
     @property
@@ -38,12 +40,12 @@ class User(shop.db.Model):
     def password_validation(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def get_reset_password_token(self, expires_in=600):
-        return jwt.encode({'reset_password': self.id, 'exp': time() + expires_in}, getenv('SECRET_KEY'),
+    def get_generated_token(self, expires_in=600):
+        return jwt.encode({'reset_password': str(self.id), 'exp': time() + expires_in}, getenv('SECRET_KEY'),
                           algorithm='HS256').encode('utf-8')
 
     @staticmethod
-    def verify_reset_password_token(token):
+    def verify_token(token):
         try:
             id = jwt.decode(token, getenv('SECRET_KEY'),
                             algorithms=['HS256'])['reset_password']

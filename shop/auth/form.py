@@ -24,11 +24,11 @@ class Registr(FlaskForm):
 class RequestResetPassword(FlaskForm):
     email = StringField('Введите ваш почтовый ящик для сброса пароля',
                         validators=[Email('Пользователь с данной почтой не найден'), DataRequired()])
-    sumbit = SubmitField('Востановить доступ')
+    submit = SubmitField('Востановить доступ')
 
 
 class ResetPassword(FlaskForm):
     password = PasswordField('Придумайте новый пароль', validators=[InputRequired()])
     password2 = PasswordField('Повторите пароль',
                               validators=[InputRequired(), EqualTo('password', 'Пароли не совпадают')])
-    sumbit = SubmitField('Сменить пароль')
+    submit = SubmitField('Сменить пароль')
