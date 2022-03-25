@@ -2,7 +2,7 @@ from flask import render_template, url_for, redirect, session, request
 
 from shop import db, recaptcha
 from shop.auth.form import LogIn, Registr, RequestResetPassword, ResetPassword
-from shop.models import User
+from shop.models import User, Role
 from . import auth
 from .email import send_password_reset_email, user_activate_account
 
@@ -16,7 +16,9 @@ def register():
             if not user:
                 user = User(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
                             password=_register.password2.data, illegal_login_attempts=0, account_status='Inactive')
+                role = Role.insert_role(_register.email.data)
                 db.session.add(user)
+                db.session.add(role)
                 db.session.commit()
                 user_activate_account(user)
                 return redirect(url_for('index'))
@@ -44,6 +46,7 @@ def login():
                             session['user_id'] = user.id
                             session['email'] = user.email
                             session['name'] = user.name
+                            session['role'] = user.role
                             return redirect(url_for('auth.my'))
                         else:
                             if user.account_status != 'Inactive':
@@ -59,7 +62,7 @@ def login():
                                 user_activate_account(user)
                                 _login.email.errors = 'Аккаунт не активирован на почту были отправленны инструкции'
                     else:
-                        _login.email.errors = 'Неверно введена почта или пароль2'
+                        _login.email.errors = 'Неверно введена почта или пароль'
             else:
                 _login.email.errors = 'Подтвердите что вы человек'
         return render_template('auth/login.html', login=_login)
@@ -81,9 +84,10 @@ def activate_account_user(token):
 def my():
     if session.get('user_id'):
         name = session['name']
+        role = session['role']
     else:
         return redirect((url_for('auth.login')))
-    return render_template('auth/user.html', name=name)
+    return render_template('auth/user.html', name=name, role=role)
 
 
 @auth.route('/logout')
@@ -115,7 +119,7 @@ def reset_password(token):
     if not user:
         return redirect(url_for('index'))
     form = ResetPassword()
-    if form.validate_on_submit() :
+    if form.validate_on_submit():
         if not user.account_status == 'Inactive':
             user.password = form.password2.data
             user.illegal_login_attempts = 0

@@ -3,7 +3,24 @@
 {% block title %}Вход{% endblock %}
 
 {% block body %}
-
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Understood</button>
+      </div>
+    </div>
+  </div>
+</div>
 <form method="POST"
       class="position-absolute top-50 start-50 translate-middle w-25 p-3 text-white border border-dark bg-gradient">
     {{ login.csrf_token }}
@@ -27,5 +44,4 @@
         <a class="position-end text-light " href="{{ url_for('auth.register') }}">Регистрация</a>
     </div>
 </form>
-
 {% endblock %}

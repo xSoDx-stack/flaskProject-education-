@@ -1,33 +1,90 @@
-from sqlalchemy.dialects.postgresql import UUID
 import uuid
-
-from werkzeug.security import check_password_hash, generate_password_hash
-import jwt
-from time import time
-import shop
 from os import getenv
+from time import time
+
+from sqlalchemy.dialects.postgresql import UUID
+from werkzeug.security import check_password_hash, generate_password_hash
+
+import jwt
+import shop
+
+
+user_role = shop.db.Table('user_role',
+                          shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id'), index=True,
+                                         primary_key=True),
+                          shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('roles.id'), index=True,
+                                         primary_key=True),
+                          )
+
+
+class RoleName:
+    buyer = 'BUYER'
+    seller = 'SELLER'
+    moderator = 'MODERATOR'
+    super_moderator = 'SUPER_MODERATOR'
+    administer = 'ADMINISTER'
 
 
 class Role(shop.db.Model):
     __tablename__ = 'roles'
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String, unique=True)
-    users = shop.db.relationship('User', backref='role', lazy='dynamic')
+    id = shop.db.Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
 
-    def __repr__(self):
-        return '<Role %r>' % self.name
+    )
+    name = shop.db.Column(
+        shop.db.String,
+        unique=True,
+    )
+
+    @staticmethod
+    def insert_role(email):
+        if email == getenv('MAIL_USERNAME'):
+            role = Role(name=RoleName.administer)
+            user = User(role=Role.name)
+        else:
+            role = Role(name=RoleName.buyer)
+            user = User(role=Role.name)
+
+        shop.db.session.add(role)
+        shop.db.session.add(user)
+        shop.db.session.commit()
 
 
 class User(shop.db.Model):
     __tablename__ = 'users'
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    email = shop.db.Column(shop.db.String, unique=False)
-    name = shop.db.Column(shop.db.String(64), nullable=False)
-    surname = shop.db.Column(shop.db.String(64), nullable=True)
-    password_hash = shop.db.Column(shop.db.Text())
-    illegal_login_attempts = shop.db.Column(shop.db.Integer, nullable=True)
-    account_status = shop.db.Column(shop.db.String(64), nullable=True)
-    role_id = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('roles.id'))
+    id = shop.db.Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
+    email = shop.db.Column(
+        shop.db.String,
+        unique=False
+    )
+    name = shop.db.Column(
+        shop.db.String(64),
+        nullable=False
+    )
+    surname = shop.db.Column(
+        shop.db.String(64),
+        nullable=True
+    )
+    password_hash = shop.db.Column(
+        shop.db.Text()
+    )
+    illegal_login_attempts = shop.db.Column(
+        shop.db.Integer,
+        nullable=True
+    )
+    account_status = shop.db.Column(
+        shop.db.String(64),
+        nullable=True
+    )
+    role = shop.db.relationship('roles', secondary=user_role, lazy='subquery',
+                                backref=shop.db.backref('role', lazy=True))
+
 
     @property
     def password(self):
@@ -47,8 +104,8 @@ class User(shop.db.Model):
     @staticmethod
     def verify_token(token):
         try:
-            id = jwt.decode(token, getenv('SECRET_KEY'),
-                            algorithms=['HS256'])['reset_password']
+            data = jwt.decode(token, getenv('SECRET_KEY'),
+                              algorithms=['HS256'])['reset_password']
         except:
             return
-        return User.query.get(id)
+        return User.query.get(data)
