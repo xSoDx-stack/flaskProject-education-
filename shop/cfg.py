@@ -11,7 +11,7 @@ class ConfigurationMail:
     MAIL_PASSWORD = getenv('MAIL_PASSWORD')
 
 
-class ConfigurationReCapcha:
+class ConfigurationReCaptcha:
     RECAPTCHA_ENABLED = True
     RECAPTCHA_SITE_KEY = getenv('RECAPTCHA_SITE_KEY')
     RECAPTCHA_SECRET_KEY = getenv('RECAPTCHA_SECRET_KEY')
@@ -23,13 +23,13 @@ class ConfigurationReCapcha:
 
 class ConfigurationDB:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    database_path ='postgres://ziwmhkpwsvrdji:6910f26a43d2fde937bb2ffad368281071dbda3b2ecd140df67602fa959460a7@ec2-63-34-153-52.eu-west-1.compute.amazonaws.com:5432/dno9je9kn6nch' #getenv('DATABASE_URL')
+    database_path = getenv('DATABASE_URL')
     if database_path.startswith('postgres://'):  # This config renaming data base linck,
         database_path = database_path.replace('postgres://', 'postgresql://', 1)  # on the cloud platform PaaS Heroku
     SQLALCHEMY_DATABASE_URI = database_path
 
 
-class Configuration(ConfigurationMail, ConfigurationReCapcha, ConfigurationDB):
+class Configuration(ConfigurationMail, ConfigurationReCaptcha, ConfigurationDB):
     DEBUG = 'True'
     SECRET_KEY = getenv('SECRET_KEY')
 
