@@ -8,7 +8,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import jwt
 import shop
 
-
 user_role = shop.db.Table('user_role',
                           shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id'), index=True,
                                          primary_key=True),
@@ -23,33 +22,6 @@ class RoleName:
     moderator = 'MODERATOR'
     super_moderator = 'SUPER_MODERATOR'
     administer = 'ADMINISTER'
-
-
-class Role(shop.db.Model):
-    __tablename__ = 'roles'
-    id = shop.db.Column(
-        UUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4
-
-    )
-    name = shop.db.Column(
-        shop.db.String,
-        unique=True,
-    )
-
-    @staticmethod
-    def insert_role(email):
-        if email == getenv('MAIL_USERNAME'):
-            role = Role(name=RoleName.administer)
-            user = User(role=Role.name)
-        else:
-            role = Role(name=RoleName.buyer)
-            user = User(role=Role.name)
-
-        shop.db.session.add(role)
-        shop.db.session.add(user)
-        shop.db.session.commit()
 
 
 class User(shop.db.Model):
@@ -82,8 +54,7 @@ class User(shop.db.Model):
         shop.db.String(64),
         nullable=True
     )
-    role = shop.db.relationship('roles', secondary=user_role, lazy='subquery',
-                                backref=shop.db.backref('role', lazy=True))
+    role = shop.db.relationship('Role', secondary=user_role, back_populates='user')
 
 
     @property
@@ -109,3 +80,33 @@ class User(shop.db.Model):
         except:
             return
         return User.query.get(data)
+
+    @staticmethod
+    def role_insert(user):
+        if user.email == getenv('MAIL_USERNAME'):
+            shop.db.session.add(user)
+            role = Role(name=RoleName.administer)
+            shop.db.session.add(role)
+            role.user.append(user)
+            shop.db.session.commit()
+        else:
+            shop.db.session.add(user)
+            role = Role(name=RoleName.buyer)
+            shop.db.session.add(role)
+            role.user.append(user)
+            shop.db.session.commit()
+
+
+class Role(shop.db.Model):
+    __tablename__ = 'roles'
+    id = shop.db.Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+
+    )
+    name = shop.db.Column(
+        shop.db.String,
+        unique=True,
+    )
+    user = shop.db.relationship('User', secondary=user_role, back_populates='role')
