@@ -3,5 +3,6 @@
 {% block title %}Личный кабинет{% endblock %}
 
 {% block body %}
-<h1>Добро пожаловать {{ name }}</h1>
+<h1>Добро пожаловать {{ session['name'] }}</h1>
+<h2>вы являетесь {% if not session['role'] %} покупателем {% else %}  {{ session['role'] }}{% endif %}</h2>
 {% endblock %}

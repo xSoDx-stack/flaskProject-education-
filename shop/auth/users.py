@@ -43,12 +43,15 @@ def login():
                             session['user_id'] = user.id
                             session['email'] = user.email
                             session['name'] = user.name
+                            if user.role:
+                                session['role'] = user.role[0].name
                             return redirect(url_for('auth.my'))
                         else:
                             if user.account_status != 'Inactive':
                                 if user.illegal_login_attempts >= 3:
                                     user.account_status = 'Block'
-                                    _login.email.errors = 'Аккаунт заблокирован, пройдите продцедуру востановления пароля'
+                                    _login.email.errors = 'Аккаунт заблокирован, пройдите продцедуру востановления ' \
+                                                          'пароля '
                                 else:
                                     user.illegal_login_attempts += 1
                                     db.session.add(user)
@@ -60,7 +63,7 @@ def login():
                     else:
                         _login.email.errors = 'Неверно введена почта или пароль'
             else:
-                _login.email.errors = 'Подтвердите что вы человек'
+                _login.email.errors = 'Подтвердите что вы не робот'
         return render_template('auth/login.html', login=_login)
 
 
@@ -78,11 +81,9 @@ def activate_account_user(token):
 
 @auth.route('/main/my')
 def my():
-    if session.get('user_id'):
-        name = session['name']
-    else:
+    if not session.get('user_id'):
         return redirect((url_for('auth.login')))
-    return render_template('auth/user.html', name=name)
+    return render_template('auth/user.html')
 
 
 @auth.route('/logout')

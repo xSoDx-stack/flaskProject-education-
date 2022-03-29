@@ -11,7 +11,7 @@
             {% if i.name != 'submit' %}
             {{ i.label }}
             {% else %}
-            {{ 'Подтвердите что вы человек' }}
+            {{ 'Подтвердите что вы не робот' }}
             {{ recaptcha }}
             {% endif %}
             {{ i  (class_="form-control") }}

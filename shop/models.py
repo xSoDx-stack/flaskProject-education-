@@ -9,10 +9,8 @@ import jwt
 import shop
 
 user_role = shop.db.Table('user_role',
-                          shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id'), index=True,
-                                         primary_key=True),
-                          shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('roles.id'), index=True,
-                                         primary_key=True),
+                          shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id')),
+                          shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('roles.id'))
                           )
 
 
@@ -91,9 +89,6 @@ class User(shop.db.Model):
             shop.db.session.commit()
         else:
             shop.db.session.add(user)
-            role = Role(name=RoleName.buyer)
-            shop.db.session.add(role)
-            role.user.append(user)
             shop.db.session.commit()
 
 
