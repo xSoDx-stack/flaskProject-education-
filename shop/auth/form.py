@@ -1,4 +1,4 @@
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField, Recaptcha
 from wtforms import StringField, SubmitField, PasswordField
 from wtforms.validators import Email, InputRequired, DataRequired, EqualTo
 
@@ -6,7 +6,7 @@ from wtforms.validators import Email, InputRequired, DataRequired, EqualTo
 class LogIn(FlaskForm):
     email = StringField('Электронная почта', validators=[Email('Неверно введена почта или пароль'), DataRequired()])
     password = PasswordField('Пароль', validators=[InputRequired()])
-    # checkbox = BooleanField('Запомнить меня')
+    recaptcha = RecaptchaField('Подтвердите что вы не робот')
     submit = SubmitField('Войти')
 
 
@@ -18,12 +18,14 @@ class Registr(FlaskForm):
     password = PasswordField('Придумайте пароль', validators=[InputRequired()])
     password2 = PasswordField('Повторите пароль',
                               validators=[InputRequired(), EqualTo('password', 'Пароли не совпадают')])
+    recaptcha = RecaptchaField('Подтвердите что вы не робот')
     submit = SubmitField('Регистрация')
 
 
 class RequestResetPassword(FlaskForm):
     email = StringField('Введите ваш почтовый ящик для сброса пароля',
                         validators=[Email('Пользователь с данной почтой не найден'), DataRequired()])
+    recaptcha = RecaptchaField('Подтвердите что вы не робот')
     submit = SubmitField('Востановить доступ')
 
 

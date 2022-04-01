@@ -1,7 +1,7 @@
 import uuid
 from os import getenv
 from time import time
-
+from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -12,14 +12,6 @@ user_role = shop.db.Table('user_role',
                           shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id')),
                           shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('roles.id'))
                           )
-
-
-class RoleName:
-    buyer = 'BUYER'
-    seller = 'SELLER'
-    moderator = 'MODERATOR'
-    super_moderator = 'SUPER_MODERATOR'
-    administer = 'ADMINISTER'
 
 
 class User(shop.db.Model):
@@ -83,7 +75,7 @@ class User(shop.db.Model):
     def role_insert(user):
         if user.email == getenv('MAIL_USERNAME'):
             shop.db.session.add(user)
-            role = Role(name=RoleName.administer)
+            role = Role(name='Администратор')
             shop.db.session.add(role)
             role.user.append(user)
             shop.db.session.commit()

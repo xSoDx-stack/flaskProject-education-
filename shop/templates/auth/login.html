@@ -39,8 +39,9 @@
                 <a href="{{ url_for('auth.send_password_reset')}}" class="link-secondary">Забыли пароль ?</a>
             </div>
         </div>
-        {{ 'Подтвердите что вы не робот' }}
-        {{ recaptcha }}
+        <div class="mb-3">
+            {{ login.recaptcha.label }}
+            {{ login.recaptcha }}
         {{ login.submit(class="btn btn-success") }}
         <a class="position-end text-light " href="{{ url_for('auth.register') }}">Регистрация</a>
     </div>

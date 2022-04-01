@@ -1,6 +1,11 @@
 from os import getenv
 
 
+class ConfigurationSesion:
+    SESSION_COOKIE_SECURE = True
+    PERMANENT_SESSION_LIFETIME = 7200
+
+
 class ConfigurationMail:
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = '587'
@@ -12,13 +17,10 @@ class ConfigurationMail:
 
 
 class ConfigurationReCaptcha:
-    RECAPTCHA_ENABLED = True
-    RECAPTCHA_SITE_KEY = getenv('RECAPTCHA_SITE_KEY')
-    RECAPTCHA_SECRET_KEY = getenv('RECAPTCHA_SECRET_KEY')
-    RECAPTCHA_THEME = 'dark'
-    RECAPTCHA_TYPE = 'image'
-    RECAPTCHA_SIZE = 'normal'
-    RECAPTCHA_RTABINDEX = 10
+    RECAPTCHA_USE_SSL = False
+    RECAPTCHA_PUBLIC_KEY = getenv('RECAPTCHA_PUBLIC_KEY')
+    RECAPTCHA_PRIVATE_KEY = getenv('RECAPTCHA_PRIVATE_KEY')
+    RECAPTCHA_DATA_ATTRS = {'theme': 'dark'}
 
 
 class ConfigurationDB:
@@ -29,11 +31,6 @@ class ConfigurationDB:
     SQLALCHEMY_DATABASE_URI = database_path
 
 
-class Configuration(ConfigurationMail, ConfigurationReCaptcha, ConfigurationDB):
+class Configuration(ConfigurationMail, ConfigurationReCaptcha, ConfigurationDB, ConfigurationSesion):
     DEBUG = 'True'
     SECRET_KEY = getenv('SECRET_KEY')
-
-
-
-
-

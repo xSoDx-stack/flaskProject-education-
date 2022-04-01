@@ -1,4 +1,4 @@
-from flask import render_template, redirect, session, url_for
+from flask import redirect, session, url_for, render_template
 
 from shop import app
 
@@ -6,6 +6,6 @@ from shop import app
 @app.route('/')
 def index():
     if session.get('user_id'):
-        pass
+        redirect(url_for('auth.my'))
 
     return render_template('index.html')

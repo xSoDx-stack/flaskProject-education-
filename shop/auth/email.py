@@ -11,20 +11,21 @@ def send_email(subject, sender, recipients, text_body, html_body):
     mail.send(msg)
 
 
-def send_password_reset_email(mail):
-    token = mail.get_generated_token()
+def send_password_reset_email(_mail):
+    token = _mail.get_generated_token()
     send_email(subject='Запрос на сброс вашего пароля',
                sender=environ.get('MAIL_USERNAME'),
-               recipients=[mail.email],
+               recipients=[_mail.email],
                text_body=render_template('auth/info_message/info_pass_res.html'),
                html_body=render_template('email/send_user_mail_reset_pas.html',
-                                         name=mail.name, token=token))
+                                         name=_mail.name, token=token))
 
-def user_activate_account(mail):
-    token = mail.get_generated_token()
+
+def user_activate_account(_mail):
+    token = _mail.get_generated_token()
     send_email(subject='Запрос на активацию вашего аккаунта',
                sender=environ.get('MAIL_USERNAME'),
-               recipients=[mail.email],
+               recipients=[_mail.email],
                text_body=render_template('auth/info_message/info_activate_account.html'),
                html_body=render_template('email/send_user_mail_activate.html',
-                                         name=mail.name, token=token))
+                                         name=_mail.name, token=token))
