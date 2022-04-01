@@ -7,9 +7,17 @@
 
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-            <a class="btn btn-outline-warning" type="button" href="#">Пользователи</a>
+            <a class="btn btn-outline-warning" type="button" href="{{ url_for('logout') }}">Выход</a>
         </li>
     </ul>
+    <div class="fs-4 mb-3">
+      <button type="button" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ session['name'] }}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+          <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
+        </svg>
+      </button>
+
+    </div>
   </div>
 </nav>
 {% endblock %}
@@ -56,6 +64,7 @@
     Заблокированных пользователей {{ user_info.block }}
   </div>
 </div>
+
 <h2>Добро пожаловать {{ session['name'] }}</h2>
 <h3>вы являетесь {{ session['role'] }}</h3>
 {% endblock %}

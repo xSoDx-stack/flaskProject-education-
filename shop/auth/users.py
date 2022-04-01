@@ -81,12 +81,6 @@ def my():
     return render_template('auth/user.html')
 
 
-@auth.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
-
-
 @auth.route('/reset_password', methods=['GET', 'POST'])
 def send_password_reset():
     res_pass = RequestResetPassword()

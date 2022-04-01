@@ -20,8 +20,10 @@ def create_app(config_class=Configuration):
     from shop.auth import auth
     from shop.administration import admin
     from shop.errors import error_bp
+    from shop.seller import seller
     app.register_blueprint(auth, url_prefix='/auth')
     app.register_blueprint(admin, url_perefix='/admin')
+    app.register_blueprint(seller, url_prefix='/seller')
     app.register_blueprint(error_bp)
     return app
 
