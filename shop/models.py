@@ -21,10 +21,10 @@ class User(shop.db.Model, fsqla.FsUserMixin):
     __tablename__ = 'users'
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = shop.db.Column(shop.db.String, unique=False)
-    username = shop.db.Column(shop.db.String(64), nullable=False)
-    surname = shop.db.Column(shop.db.String(64), nullable=True)
+    username = shop.db.Column(shop.db.String(64))
+    surname = shop.db.Column(shop.db.String(64))
     password = shop.db.Column(shop.db.String(255), nullable=False)
-    active = shop.db.Column(shop.db.Boolean(), nullable=False, default=False)
+    active = shop.db.Column(shop.db.Boolean(), nullable=False)
     fs_uniquifier = shop.db.Column(shop.db.String(64))
     confirmed_at = shop.db.Column(shop.db.DateTime())
     last_login_at = shop.db.Column(shop.db.DateTime())

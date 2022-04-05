@@ -13,6 +13,7 @@ def register():
         if not user_datastore.find_user(email=_register.email.data):
             registerable.register_user(_register)
             db.session.commit()
+            return render_template('info_message/info_activate_account.html')
         else:
             _register.email.errors = ["Пользователь с такой почтой уже зарегестрирован"]
     return render_template('auth/registration.html', register=_register)

@@ -1,15 +1,23 @@
 from os import getenv
+from shop.errors.errors import page_not_found
 
 
-class ConfigurationRegisterable:
+class ConfigurationFlaskSecuritytToo:
+    """"Registerable"""
     SECURITY_REGISTERABLE = True
     SECURITY_SEND_REGISTER_EMAIL = True
     SECURITY_EMAIL_SUBJECT_REGISTER = "Подтверждение регистрации"
+    SECURITY_REGISTER_URL = '/register'
+    """Confirmable"""
     SECURITY_CONFIRMABLE = True
     SECURITY_CONFIRM_EMAIL_WITHIN = 2
+    SECURITY_CONFIRM_URL = '/confirm'
     SECURITY_UNIFIED_SIGNIN = False
+    SECURITY_SEND_CONFIRMATION_TEMPLATE = 'security/send_confirmation.html'
     SECURITY_EMAIL_SENDER = getenv('MAIL_USERNAME')
-    SEND_REGISTER_EMAIL = True
+    SECURITY_CONFIRM_ERROR_VIEW = page_not_found
+    """"Core"""
+    SECURITY_BLUEPRINT_NAME = '/auth'
 
 
 class ConfigurationMail:
@@ -17,8 +25,8 @@ class ConfigurationMail:
     MAIL_PORT = '587'
     MAIL_USE_SSL = False
     MAIL_USE_TLS = True
-    MAIL_DEBUG = True
     MAIL_USERNAME = getenv('MAIL_USERNAME')
+    MAIL_DEBUG = True
     MAIL_PASSWORD = getenv('MAIL_PASSWORD')
 
 
@@ -37,7 +45,7 @@ class ConfigurationDB:
     SQLALCHEMY_DATABASE_URI = database_path
 
 
-class Configuration(ConfigurationMail, ConfigurationReCaptcha, ConfigurationDB, ConfigurationRegisterable):
+class Configuration(ConfigurationMail, ConfigurationReCaptcha, ConfigurationDB, ConfigurationFlaskSecuritytToo):
     DEBUG = 'True'
     SECRET_KEY = getenv('SECRET_KEY')
     SECURITY_PASSWORD_SALT = getenv('SECURITY_PASSWORD_SALT')
