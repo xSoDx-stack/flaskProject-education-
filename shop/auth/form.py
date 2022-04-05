@@ -1,6 +1,7 @@
-from flask_wtf import FlaskForm, RecaptchaField, Recaptcha
+from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, SubmitField, PasswordField
-from wtforms.validators import Email, InputRequired, DataRequired, EqualTo
+from wtforms.validators import Email, InputRequired, DataRequired, EqualTo, Length
+from flask_security import ConfirmRegisterForm
 
 
 class LogIn(FlaskForm):
@@ -10,13 +11,15 @@ class LogIn(FlaskForm):
     submit = SubmitField('Войти')
 
 
-class Registr(FlaskForm):
+class Registr(ConfirmRegisterForm):
     email = StringField('Введите действующую электронную почту',
                         validators=[Email('Неверная запись адреса электронной почты'), DataRequired()])
-    name = StringField('Введите ваше имя', validators=[InputRequired()])
+    username = StringField('Введите ваше имя', validators=[InputRequired('Это поле обязательно к заполнения')])
     surname = StringField('Введите вашу фамилию', validators=[InputRequired()])
-    password = PasswordField('Придумайте пароль', validators=[InputRequired()])
-    password2 = PasswordField('Повторите пароль',
+    password = PasswordField('Придумайте пароль', validators=[InputRequired(), DataRequired(),
+                                                              Length(min=8,
+                                                                     message="Пароль должен содержать не менее %(min)d символов ")])
+    password_confirm = PasswordField('Повторите пароль',
                               validators=[InputRequired(), EqualTo('password', 'Пароли не совпадают')])
     recaptcha = RecaptchaField('Подтвердите что вы не робот')
     submit = SubmitField('Регистрация')

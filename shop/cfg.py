@@ -1,9 +1,15 @@
 from os import getenv
 
 
-class ConfigurationSesion:
-    SESSION_COOKIE_SECURE = True
-    PERMANENT_SESSION_LIFETIME = 7200
+class ConfigurationRegisterable:
+    SECURITY_REGISTERABLE = True
+    SECURITY_SEND_REGISTER_EMAIL = True
+    SECURITY_EMAIL_SUBJECT_REGISTER = "Подтверждение регистрации"
+    SECURITY_CONFIRMABLE = True
+    SECURITY_CONFIRM_EMAIL_WITHIN = 2
+    SECURITY_UNIFIED_SIGNIN = False
+    SECURITY_EMAIL_SENDER = getenv('MAIL_USERNAME')
+    SEND_REGISTER_EMAIL = True
 
 
 class ConfigurationMail:
@@ -31,6 +37,9 @@ class ConfigurationDB:
     SQLALCHEMY_DATABASE_URI = database_path
 
 
-class Configuration(ConfigurationMail, ConfigurationReCaptcha, ConfigurationDB, ConfigurationSesion):
+class Configuration(ConfigurationMail, ConfigurationReCaptcha, ConfigurationDB, ConfigurationRegisterable):
     DEBUG = 'True'
     SECRET_KEY = getenv('SECRET_KEY')
+    SECURITY_PASSWORD_SALT = getenv('SECURITY_PASSWORD_SALT')
+    SECURITY_PASSWORD_HASH = 'bcrypt'  # bcrypt, argon2, sha512_crypt, or pbkdf2_sha512.
+    SECURITY_TRACKABLE = True

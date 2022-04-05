@@ -1,6 +1,8 @@
-from flask import redirect, session, url_for, render_template
-
+from flask import redirect, session, url_for, render_template, current_app
+from flask_security import hash_password
 from shop import app
+from shop.models import user_datastore
+import shop
 
 
 @app.route('/')

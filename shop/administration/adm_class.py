@@ -1,6 +1,5 @@
 from shop import db
 from shop.models import User
-from flask import url_for, redirect
 
 
 class UserInfo:

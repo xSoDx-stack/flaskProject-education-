@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_security import Security
 from shop.cfg import Configuration
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
+security = Security()
 
 
 def create_app(config_class=Configuration):
@@ -17,6 +18,8 @@ def create_app(config_class=Configuration):
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
+    from shop.models import user_datastore
+    security.init_app(app, user_datastore)
     from shop.auth import auth
     from shop.administration import admin
     from shop.errors import error_bp

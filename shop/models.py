@@ -1,99 +1,57 @@
+import datetime
 import uuid
-from os import getenv
-from time import time
+
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
-from werkzeug.security import check_password_hash, generate_password_hash
-
-import jwt
+from flask_security import SQLAlchemyUserDatastore
+from flask_security.models import fsqla_v2 as fsqla
 import shop
 
-user_role = shop.db.Table('user_role',
-                          shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id')),
-                          shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('roles.id'))
-                          )
+fsqla.FsModels.set_db_info(shop.db)
 
 
-class User(shop.db.Model):
+class RolesUsers(shop.db.Model):
+    __tablename__ = 'roles_users'
+    __table_args__ = {'extend_existing': True}
+    user_id = shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id'), primary_key=True)
+    role_id = shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('roles.id'), primary_key=True)
+
+
+class User(shop.db.Model, fsqla.FsUserMixin):
     __tablename__ = 'users'
-    id = shop.db.Column(
-        UUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4
-    )
-    email = shop.db.Column(
-        shop.db.String,
-        unique=False
-    )
-    name = shop.db.Column(
-        shop.db.String(64),
-        nullable=False
-    )
-    surname = shop.db.Column(
-        shop.db.String(64),
-        nullable=True
-    )
-    password_hash = shop.db.Column(
-        shop.db.Text()
-    )
-    illegal_login_attempts = shop.db.Column(
-        shop.db.Integer,
-        nullable=True
-    )
-    account_status = shop.db.Column(
-        shop.db.String(64),
-        nullable=True
-    )
-    role = shop.db.relationship('Role', secondary=user_role, back_populates='user')
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email = shop.db.Column(shop.db.String, unique=False)
+    username = shop.db.Column(shop.db.String(64), nullable=False)
+    surname = shop.db.Column(shop.db.String(64), nullable=True)
+    password = shop.db.Column(shop.db.String(255), nullable=False)
+    active = shop.db.Column(shop.db.Boolean(), nullable=False, default=False)
+    fs_uniquifier = shop.db.Column(shop.db.String(64))
+    confirmed_at = shop.db.Column(shop.db.DateTime())
+    last_login_at = shop.db.Column(shop.db.DateTime())
+    current_login_at = shop.db.Column(shop.db.DateTime())
+    last_login_ip = shop.db.Column(shop.db.String(64))
+    current_login_ip = shop.db.Column(shop.db.String(64))
+    login_count = shop.db.Column(shop.db.Integer)
+    tf_primary_method = shop.db.Column(shop.db.String(64), nullable=True)
+    tf_totp_secret = shop.db.Column(shop.db.String(255), nullable=True)
+    tf_phone_number = shop.db.Column(shop.db.String(128), nullable=True)
+    create_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
+    update_datetime = shop.db.Column(shop.db.DateTime(), nullable=False, server_default=func.now(),
+                                     onupdate=datetime.datetime.utcnow)
+    us_totp_secrets = shop.db.Column(shop.db.Text, nullable=True)
+    us_phone_number = shop.db.Column(shop.db.String(128), nullable=True)
 
 
-    @property
-    def password(self):
-        raise AttributeError('Запрещенн доступ к паролю')
-
-    @password.setter
-    def password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def password_validation(self, password):
-        return check_password_hash(self.password_hash, password)
-
-    def get_generated_token(self, expires_in=600):
-        return jwt.encode({'reset_password': str(self.id), 'exp': time() + expires_in}, getenv('SECRET_KEY'),
-                          algorithm='HS256').encode('utf-8')
-
-    @staticmethod
-    def verify_token(token):
-        try:
-            data = jwt.decode(token, getenv('SECRET_KEY'),
-                              algorithms=['HS256'])['reset_password']
-        except:
-            return
-        return User.query.get(data)
-
-    @staticmethod
-    def role_insert(user):
-        if user.email == getenv('MAIL_USERNAME'):
-            shop.db.session.add(user)
-            role = Role(name='Администратор')
-            shop.db.session.add(role)
-            role.user.append(user)
-            shop.db.session.commit()
-        else:
-            shop.db.session.add(user)
-            shop.db.session.commit()
 
 
-class Role(shop.db.Model):
+class Role(shop.db.Model, fsqla.FsRoleMixin):
     __tablename__ = 'roles'
-    id = shop.db.Column(
-        UUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String, unique=True)
+    description = shop.db.Column(shop.db.String(255))
+    permissions = shop.db.Column(shop.db.String(255))
+    update_datetime = shop.db.Column(shop.db.DateTime(), nullable=False, server_default=func.now(),
+                                     onupdate=datetime.datetime.utcnow())
 
-    )
-    name = shop.db.Column(
-        shop.db.String,
-        unique=True,
-    )
-    user = shop.db.relationship('User', secondary=user_role, back_populates='role')
+
+user_datastore = SQLAlchemyUserDatastore(shop.db, User, Role)
