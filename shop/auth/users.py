@@ -45,8 +45,7 @@ def login():
                         if user.account_status != 'Inactive':
                             if user.illegal_login_attempts >= 3:
                                 user.account_status = 'Block'
-                                _login.email.errors = ['Аккаунт заблокирован, пройдите продцедуру востановления ' \
-                                                      'пароля ']
+                                _login.email.errors = ['Аккаунт заблокирован, пройдите продцедуру востановления пароля']
                             else:
                                 user.illegal_login_attempts += 1
                                 db.session.add(user)
@@ -66,10 +65,9 @@ def login():
 def activate_account_user(token):
     user = User.verify_token(token)
     if user:
-        user.account_status = 'Active'
         db.session.add(user)
         db.session.commit()
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('index'))
     else:
         return redirect(url_for('auth.register'))
 

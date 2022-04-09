@@ -1,11 +1,9 @@
 import uuid
 from os import getenv
-from time import time
-from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 from werkzeug.security import check_password_hash, generate_password_hash
-
-import jwt
+from itsdangerous.exc import BadData
+# import jwt
 import shop
 
 user_role = shop.db.Table('user_role',
@@ -16,36 +14,14 @@ user_role = shop.db.Table('user_role',
 
 class User(shop.db.Model):
     __tablename__ = 'users'
-    id = shop.db.Column(
-        UUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4
-    )
-    email = shop.db.Column(
-        shop.db.String,
-        unique=False
-    )
-    name = shop.db.Column(
-        shop.db.String(64),
-        nullable=False
-    )
-    surname = shop.db.Column(
-        shop.db.String(64),
-        nullable=True
-    )
-    password_hash = shop.db.Column(
-        shop.db.Text()
-    )
-    illegal_login_attempts = shop.db.Column(
-        shop.db.Integer,
-        nullable=True
-    )
-    account_status = shop.db.Column(
-        shop.db.String(64),
-        nullable=True
-    )
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    email = shop.db.Column(shop.db.String, unique=False)
+    name = shop.db.Column(shop.db.String(64), nullable=False)
+    surname = shop.db.Column(shop.db.String(64), nullable=True)
+    password_hash = shop.db.Column(shop.db.Text())
+    illegal_login_attempts = shop.db.Column(shop.db.Integer, nullable=True)
+    account_status = shop.db.Column(shop.db.String(64), nullable=True)
     role = shop.db.relationship('Role', secondary=user_role, back_populates='user')
-
 
     @property
     def password(self):
@@ -58,18 +34,23 @@ class User(shop.db.Model):
     def password_validation(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def get_generated_token(self, expires_in=600):
-        return jwt.encode({'reset_password': str(self.id), 'exp': time() + expires_in}, getenv('SECRET_KEY'),
-                          algorithm='HS256').encode('utf-8')
+    # def get_generated_token(self, expires_in=600):
+    #     return jwt.encode({'reset_password': str(self.id), 'exp': time() + expires_in}, getenv('SECRET_KEY'),
+    #                       algorithm='HS256').encode('utf-8')
+    def get_generated_token(self):
+        return shop.serialize.dumps(
+            {'id': str(self.id), 'email': self.email, 'name': self.name, 'account_status': 'Active'}).encode('utf-8')
 
     @staticmethod
     def verify_token(token):
         try:
-            data = jwt.decode(token, getenv('SECRET_KEY'),
-                              algorithms=['HS256'])['reset_password']
-        except:
+            # data = jwt.decode(token, getenv('SECRET_KEY'),
+            #                   algorithms=['HS256'])['reset_password']
+            data = shop.serialize.loads(token, max_age=6000)
+        except BadData:
             return
-        return User.query.get(data)
+        print(data)
+        return data
 
     @staticmethod
     def role_insert(user):
@@ -86,14 +67,6 @@ class User(shop.db.Model):
 
 class Role(shop.db.Model):
     __tablename__ = 'roles'
-    id = shop.db.Column(
-        UUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4
-
-    )
-    name = shop.db.Column(
-        shop.db.String,
-        unique=True,
-    )
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String, unique=True)
     user = shop.db.relationship('User', secondary=user_role, back_populates='role')
