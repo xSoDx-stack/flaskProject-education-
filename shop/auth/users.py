@@ -4,7 +4,7 @@ from shop import db
 from shop.auth.form import LogIn, Registr, RequestResetPassword, ResetPassword
 from shop.models import User
 from . import auth
-from .email import send_password_reset_email, user_activate_account
+from .email import send_password_reset_email, user_activate_account, unique
 
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -14,7 +14,7 @@ def register():
         user = User.query.filter_by(email=_register.email.data).first()
         if not user:
             user = User(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
-                        password=_register.password2.data, illegal_login_attempts=0, account_status='Inactive')
+                        password=_register.password2.data, fs_uniquifier=unique(_register.email.data))
             User.role_insert(user)
             user_activate_account(user)
             return render_template('auth/info_message/info_activate_account.html')
@@ -63,13 +63,14 @@ def login():
 
 @auth.route('/login/<token>', methods=['GET', 'POST'])
 def activate_account_user(token):
-    user = User.verify_token(token)
+    user = User.query.filter(User.fs_uniquifier == User.verify_token(token)).first()
     if user:
+        user.active = True
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('index'))
     else:
-        return redirect(url_for('auth.register'))
+        return render_template('auth/info_message/not_valid_confirm.html')
 
 
 @auth.route('/main/my')

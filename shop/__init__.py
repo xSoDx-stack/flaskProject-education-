@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer, URLSafeSerializer
 from shop.cfg import Configuration
 from flask_mail import Mail
 from flask_migrate import Migrate
@@ -9,7 +9,8 @@ from os import getenv
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
-serialize = URLSafeTimedSerializer(getenv('TOKEN_SECRET_KEY'), salt=getenv('TOKEN_SALT'))
+serialize = URLSafeTimedSerializer(secret_key=getenv('TOKEN_SECRET_KEY'), salt=getenv('TOKEN_SALT'))
+ser_user = URLSafeSerializer(secret_key=getenv('TOKEN_SECRET_KEY'), salt=getenv('TOKEN_SALT'))
 
 
 def create_app(config_class=Configuration):

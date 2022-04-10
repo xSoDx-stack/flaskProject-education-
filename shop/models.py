@@ -16,11 +16,15 @@ class User(shop.db.Model):
     __tablename__ = 'users'
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = shop.db.Column(shop.db.String, unique=False)
-    name = shop.db.Column(shop.db.String(64), nullable=False)
+    name = shop.db.Column(shop.db.String(64), nullable=True)
     surname = shop.db.Column(shop.db.String(64), nullable=True)
+    phone_number = shop.db.Column(shop.db.String(128), nullable=True)
+    fs_uniquifier = shop.db.Column(shop.db.String(128), unique=True)
+    active = shop.db.Column(shop.db.Boolean(), nullable=False, default=False)
     password_hash = shop.db.Column(shop.db.Text())
-    illegal_login_attempts = shop.db.Column(shop.db.Integer, nullable=True)
-    account_status = shop.db.Column(shop.db.String(64), nullable=True)
+    confirmed_at = shop.db.Column(shop.db.DateTime())
+    last_login_ip = shop.db.Column(shop.db.String(64))
+    current_login_ip = shop.db.Column(shop.db.String(64))
     role = shop.db.relationship('Role', secondary=user_role, back_populates='user')
 
     @property
@@ -38,18 +42,16 @@ class User(shop.db.Model):
     #     return jwt.encode({'reset_password': str(self.id), 'exp': time() + expires_in}, getenv('SECRET_KEY'),
     #                       algorithm='HS256').encode('utf-8')
     def get_generated_token(self):
-        return shop.serialize.dumps(
-            {'id': str(self.id), 'email': self.email, 'name': self.name, 'account_status': 'Active'}).encode('utf-8')
+        return shop.serialize.dumps(self.fs_uniquifier)
 
     @staticmethod
     def verify_token(token):
         try:
             # data = jwt.decode(token, getenv('SECRET_KEY'),
             #                   algorithms=['HS256'])['reset_password']
-            data = shop.serialize.loads(token, max_age=6000)
+            data = shop.serialize.loads(token, max_age=20)
         except BadData:
             return
-        print(data)
         return data
 
     @staticmethod

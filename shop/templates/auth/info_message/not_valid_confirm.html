@@ -1,0 +1,10 @@
+{% extends "index.html" %}
+
+{% block title %}Подтверждение почты{% endblock %}
+
+{% block body %}
+<div class="alert alert-danger" role="alert">
+    <h1>Истёк строк активации почты, пройдите заново регистрацию</h1>
+<a href="{{ url_for('auth.register')}}" class="link-secondary">Регистрация</a>
+</div>
+{% endblock %}
