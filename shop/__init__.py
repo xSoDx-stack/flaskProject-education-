@@ -5,12 +5,15 @@ from shop.cfg import Configuration
 from flask_mail import Mail
 from flask_migrate import Migrate
 from os import getenv
+import hashlib
 
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
-serialize = URLSafeTimedSerializer(secret_key=getenv('TOKEN_SECRET_KEY'), salt=getenv('TOKEN_SALT'))
-ser_user = URLSafeSerializer(secret_key=getenv('TOKEN_SECRET_KEY'), salt=getenv('TOKEN_SALT'))
+serialize = URLSafeTimedSerializer(secret_key=getenv('TOKEN_SECRET_KEY'), salt=getenv('TOKEN_SALT'),
+                                   signer_kwargs={"digest_method": hashlib.sha512})
+ser_user = URLSafeSerializer(secret_key=getenv('TOKEN_SECRET_KEY'), salt=getenv('TOKEN_SALT'),
+                             signer_kwargs={"digest_method": hashlib.sha512})
 
 
 def create_app(config_class=Configuration):

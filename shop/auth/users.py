@@ -1,10 +1,10 @@
 from flask import render_template, url_for, redirect, session, request
 
-from shop import db
-from shop.auth.form import LogIn, Registr, RequestResetPassword, ResetPassword
+from shop import db, ser_user
+from shop.auth.form import LogIn, Registr, RequestResetPasswordForm, ResetPasswordForm
 from shop.models import User
 from . import auth
-from .email import send_password_reset_email, user_activate_account, unique
+from .email import send_password_reset_email, user_activate_account
 
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -14,7 +14,7 @@ def register():
         user = User.query.filter_by(email=_register.email.data).first()
         if not user:
             user = User(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
-                        password=_register.password2.data, fs_uniquifier=unique(_register.email.data))
+                        password=_register.password2.data, fs_uniquifier=ser_user.dumps(_register.email.data))
             User.role_insert(user)
             user_activate_account(user)
             return render_template('auth/info_message/info_activate_account.html')
@@ -61,7 +61,7 @@ def login():
         return render_template('auth/login.html', login=_login)
 
 
-@auth.route('/login/<token>', methods=['GET', 'POST'])
+@auth.route('/confirm/<token>', methods=['GET', 'POST'])
 def activate_account_user(token):
     user = User.query.filter(User.fs_uniquifier == User.verify_token(token)).first()
     if user:
@@ -82,11 +82,11 @@ def my():
 
 @auth.route('/reset_password', methods=['GET', 'POST'])
 def send_password_reset():
-    res_pass = RequestResetPassword()
+    res_pass = RequestResetPasswordForm()
     if request.method == 'POST' and res_pass.validate_on_submit():
-        mail = User.query.filter_by(email=res_pass.email.data).first()
-        if mail:
-            send_password_reset_email(mail)
+        user = User.query.filter_by(email=res_pass.email.data).first()
+        if user:
+            send_password_reset_email(user)
             return render_template('auth/info_message/info_pass_res.html')
         else:
             res_pass.email.errors = ['Пользователя с такой почтой не найдено']
@@ -98,7 +98,7 @@ def reset_password(token):
     user = User.verify_token(token)
     if not user:
         return redirect(url_for('index'))
-    form = ResetPassword()
+    form = ResetPasswordForm()
     if form.validate_on_submit():
         if not user.account_status == 'Inactive':
             user.password = form.password2.data

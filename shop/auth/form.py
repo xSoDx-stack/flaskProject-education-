@@ -6,7 +6,7 @@ from wtforms.validators import Email, InputRequired, DataRequired, EqualTo
 class LogIn(FlaskForm):
     email = StringField('Электронная почта', validators=[Email('Неверно введена почта или пароль'), DataRequired()])
     password = PasswordField('Пароль', validators=[InputRequired()])
-    recaptcha = RecaptchaField('Подтвердите что вы не робот')
+    recaptcha = RecaptchaField('Подтвердите что вы не робот',  validators=[Recaptcha('вы не подтвердили что вы не робот')])
     submit = SubmitField('Войти')
 
 
@@ -18,18 +18,18 @@ class Registr(FlaskForm):
     password = PasswordField('Придумайте пароль', validators=[InputRequired()])
     password2 = PasswordField('Повторите пароль',
                               validators=[InputRequired(), EqualTo('password', 'Пароли не совпадают')])
-    recaptcha = RecaptchaField('Подтвердите что вы не робот')
+    recaptcha = RecaptchaField('Подтвердите что вы не робот', validators=[Recaptcha('вы не подтвердили что вы не робот')])
     submit = SubmitField('Регистрация')
 
 
-class RequestResetPassword(FlaskForm):
+class RequestResetPasswordForm(FlaskForm):
     email = StringField('Введите ваш почтовый ящик для сброса пароля',
                         validators=[Email('Пользователь с данной почтой не найден'), DataRequired()])
-    recaptcha = RecaptchaField('Подтвердите что вы не робот')
+    recaptcha = RecaptchaField('Подтвердите что вы не робот',  validators=[Recaptcha('вы не подтвердили что вы не робот')])
     submit = SubmitField('Востановить доступ')
 
 
-class ResetPassword(FlaskForm):
+class ResetPasswordForm(FlaskForm):
     password = PasswordField('Придумайте новый пароль', validators=[InputRequired()])
     password2 = PasswordField('Повторите пароль',
                               validators=[InputRequired(), EqualTo('password', 'Пароли не совпадают')])

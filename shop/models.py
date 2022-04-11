@@ -3,8 +3,10 @@ from os import getenv
 from sqlalchemy.dialects.postgresql import UUID
 from werkzeug.security import check_password_hash, generate_password_hash
 from itsdangerous.exc import BadData
-# import jwt
 import shop
+from sqlalchemy import func
+from datetime import datetime
+
 
 user_role = shop.db.Table('user_role',
                           shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id')),
@@ -25,7 +27,11 @@ class User(shop.db.Model):
     confirmed_at = shop.db.Column(shop.db.DateTime())
     last_login_ip = shop.db.Column(shop.db.String(64))
     current_login_ip = shop.db.Column(shop.db.String(64))
+    update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
+                                     onupdate=datetime.utcnow)
+    create_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
     role = shop.db.relationship('Role', secondary=user_role, back_populates='user')
+
 
     @property
     def password(self):
@@ -38,18 +44,13 @@ class User(shop.db.Model):
     def password_validation(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # def get_generated_token(self, expires_in=600):
-    #     return jwt.encode({'reset_password': str(self.id), 'exp': time() + expires_in}, getenv('SECRET_KEY'),
-    #                       algorithm='HS256').encode('utf-8')
     def get_generated_token(self):
         return shop.serialize.dumps(self.fs_uniquifier)
 
     @staticmethod
     def verify_token(token):
         try:
-            # data = jwt.decode(token, getenv('SECRET_KEY'),
-            #                   algorithms=['HS256'])['reset_password']
-            data = shop.serialize.loads(token, max_age=20)
+            data = shop.serialize.loads(token, max_age=7000)
         except BadData:
             return
         return data
