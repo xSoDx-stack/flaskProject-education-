@@ -6,7 +6,7 @@ from itsdangerous.exc import BadData
 import shop
 from sqlalchemy import func
 from datetime import datetime
-
+from flask_login import UserMixin, AnonymousUserMixin
 
 user_role = shop.db.Table('user_role',
                           shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id')),
@@ -14,7 +14,7 @@ user_role = shop.db.Table('user_role',
                           )
 
 
-class User(shop.db.Model):
+class User(shop.db.Model, UserMixin):
     __tablename__ = 'users'
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = shop.db.Column(shop.db.String, unique=False)
@@ -32,10 +32,9 @@ class User(shop.db.Model):
     create_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
     role = shop.db.relationship('Role', secondary=user_role, back_populates='user')
 
-
     @property
     def password(self):
-        raise AttributeError('Запрещенн доступ к паролю')
+        raise AttributeError("Доступ к паролю запрещён")
 
     @password.setter
     def password(self, password):

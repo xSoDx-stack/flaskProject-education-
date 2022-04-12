@@ -42,6 +42,10 @@
         <div class="mb-3">
             {{ login.recaptcha.label }}
             {{ login.recaptcha }}
+            {{ login.remember_me.label }}
+            {{ login.remember_me }}
+        </div>
+    <div class="mb-3">
         {{ login.submit(class="btn btn-success") }}
         <a class="position-end text-light " href="{{ url_for('auth.register') }}">Регистрация</a>
     </div>

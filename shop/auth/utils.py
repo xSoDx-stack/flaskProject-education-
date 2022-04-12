@@ -2,6 +2,8 @@ from flask import render_template
 from flask_mail import Message
 from shop import mail
 from os import environ
+from shop.models import User
+from shop import login_manager
 
 
 def send_email(subject, sender, recipients, text_body, html_body):
@@ -27,3 +29,8 @@ def user_activate_account(user):
                text_body=render_template('auth/info_message/info_activate_account.html'),
                html_body=render_template('email/send_user_mail_activate.html',
                                          name=user.name, token=user.get_generated_token()))
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
