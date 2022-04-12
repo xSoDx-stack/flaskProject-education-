@@ -12,12 +12,10 @@ db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
 login_manager = LoginManager()
-login_manager.session_protection = 'strong'
-login_manager.login_view = 'auth.login'
 
-serialize = URLSafeTimedSerializer(secret_key=getenv('TOKEN_SECRET_KEY'), salt=getenv('TOKEN_SALT'),
+serialize = URLSafeTimedSerializer(secret_key=Configuration.TOKEN_SECRET_KEY, salt=Configuration.TOKEN_SALT,
                                    signer_kwargs={"digest_method": hashlib.sha512})
-ser_user = URLSafeSerializer(secret_key=getenv('TOKEN_SECRET_KEY'), salt=getenv('TOKEN_SALT'),
+ser_user = URLSafeSerializer(secret_key=Configuration.TOKEN_SECRET_KEY, salt=Configuration.TOKEN_SALT,
                              signer_kwargs={"digest_method": hashlib.sha512})
 
 
@@ -28,6 +26,7 @@ def create_app(config_class=Configuration):
     migrate.init_app(app, db)
     mail.init_app(app)
     login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
     from shop.auth import auth
     from shop.administration import admin
     from shop.errors import error_bp

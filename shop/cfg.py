@@ -1,12 +1,17 @@
 from os import getenv
 
+class ConfigurationFlaskLogin:
+    REMEMBER_COOKIE_DURATION = 86400
+    REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True
+    SESSION_PROTECTION = 'strong'
 
-class ConfigurationSesion:
+
+class ConfigurationSesion(ConfigurationFlaskLogin):
     SESSION_COOKIE_SECURE = True
     PERMANENT_SESSION_LIFETIME = 7200
 
 
-class ConfigurationMail:
+class ConfigurationMail(ConfigurationSesion):
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = '587'
     MAIL_USE_SSL = False
@@ -16,14 +21,14 @@ class ConfigurationMail:
     MAIL_PASSWORD = getenv('MAIL_PASSWORD')
 
 
-class ConfigurationReCaptcha:
+class ConfigurationReCaptcha(ConfigurationMail):
     RECAPTCHA_USE_SSL = False
     RECAPTCHA_PUBLIC_KEY = getenv('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = getenv('RECAPTCHA_PRIVATE_KEY')
     RECAPTCHA_DATA_ATTRS = {'theme': 'dark'}
 
 
-class ConfigurationDB:
+class ConfigurationDB(ConfigurationReCaptcha):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     database_path = getenv('DATABASE_URL')
     if database_path.startswith('postgres://'):  # This config renaming data base linck,
@@ -31,6 +36,9 @@ class ConfigurationDB:
     SQLALCHEMY_DATABASE_URI = database_path
 
 
-class Configuration(ConfigurationMail, ConfigurationReCaptcha, ConfigurationDB, ConfigurationSesion):
+class Configuration(ConfigurationDB):
     DEBUG = 'True'
     SECRET_KEY = getenv('SECRET_KEY')
+    TOKEN_SECRET_KEY = getenv('TOKEN_SECRET_KEY')
+    TOKEN_SALT = getenv('TOKEN_SALT')
+
