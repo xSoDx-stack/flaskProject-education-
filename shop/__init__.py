@@ -27,6 +27,7 @@ def create_app(config_class=Configuration):
     mail.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+    login_manager.session_protection = 'strong'
     from shop.auth import auth
     from shop.administration import admin
     from shop.errors import error_bp

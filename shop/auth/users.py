@@ -1,10 +1,11 @@
-from flask import render_template, url_for, redirect, session, request
+from flask import render_template, url_for, redirect, request, current_app
 from flask_login import login_user, login_required, current_user
-from shop import db, ser_user
+
+from shop import db, ser_user, login_manager
 from shop.auth.form import LogInForm, RegistrForm, RequestResetPasswordForm, ResetPasswordForm
 from shop.models import User
 from . import auth
-from .utils import send_password_reset_email, user_activate_account, load_user
+from .utils import send_password_reset_email, user_activate_account
 
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -14,9 +15,10 @@ def register():
         if request.method == 'POST' and _register.validate_on_submit():
             user = User.query.filter_by(email=_register.email.data).first()
             if not user:
-                user = User(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
-                            password=_register.confirm_password.data, fs_uniquifier=ser_user.dumps(_register.email.data))
-                User.role_insert(user)
+                user = user(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
+                            password=_register.confirm_password.data,
+                            fs_uniquifier=ser_user.dumps(_register.email.data))
+                user.role_insert(user)
                 user_activate_account(user)
                 return render_template('auth/info_message/info_activate_account.html')
             else:
@@ -44,15 +46,17 @@ def login():
 
 @auth.route('/confirm/<token>', methods=['GET', 'POST'])
 def activate_account_user(token):
-    user = User.query.filter(User.fs_uniquifier == User.verify_token(token)).first()
-    if user:
-        login_user(user)
-        user.active = True
-        db.session.add(user)
-        db.session.commit()
-        return redirect(url_for('auth.my'))
+    if not current_user.is_authenticated:
+        user = User.query.filter(User.fs_uniquifier == User.verify_token(token)).first()
+        if user:
+            login_user(user)
+            user.active = True
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for('auth.my'))
     else:
-        return render_template('auth/info_message/not_valid_confirm.html')
+        return redirect(url_for('auth.my'))
+    return render_template('auth/info_message/not_valid_confirm.html')
 
 
 @auth.route('/main/my')
@@ -77,20 +81,22 @@ def send_password_reset():
     return render_template('auth/send_password_reset.html', res_pass=res_pass)
 
 
-# @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
-# def reset_password(token):
-#     user = User.verify_token(token)
-#     if not user:
-#         return redirect(url_for('index'))
-#     form = ResetPasswordForm()
-#     if form.validate_on_submit():
-#         if not user.account_status == 'Inactive':
-#             user.password = form.confirm_password.data
-#             user.illegal_login_attempts = 0
-#             user.account_status = 'Active'
-#             db.session.add(user)
-#             db.session.commit()
-#             return render_template('auth/pass_successfully_changed.html')
-#         else:
-#             form.password.errors = ['Аккаунт не был активирован']
-#     return render_template('auth/reset_password.html', form=form)
+@auth.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if not current_user.is_authenticated:
+        form = ResetPasswordForm()
+        user = User.query.filter_by(fs_uniquifier=User.verify_token(token)).first()
+        if user:
+            print(user.email)
+            if form.validate_on_submit():
+                print("после нажатия кнопки")
+                user.password = form.confirm_password.data
+                user.get_generated_token()  # bad generate token
+                db.session.add(user)
+                db.session.commit()
+                return render_template('auth/pass_successfully_changed.html')
+            else:
+                print("сразу елсе проблема валидации")
+    else:
+        return redirect(url_for('auth.my'))
+    return render_template('auth/reset_password.html', form=form)

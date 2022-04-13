@@ -33,4 +33,4 @@ def user_activate_account(user):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(user_id)
+    return User.query.filter_by(fs_uniquifier=user_id).first()

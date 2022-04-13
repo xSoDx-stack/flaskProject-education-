@@ -22,9 +22,11 @@
                         <a class="nav-link active" aria-current="page" href="{{ url_for('auth.login') }}">Вход</a>
                         {% endif %}
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.my') }}">Личный кабинет</a>
-                    </li>
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('auth.my') }}">Личный кабинет</a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">

@@ -44,7 +44,7 @@ class User(shop.db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
     def get_generated_token(self):
-        return shop.serialize.dumps(self.fs_uniquifier)
+        return shop.serialize.dumps(self.fs_uniquifier)  # bad generate token
 
     @staticmethod
     def verify_token(token):
@@ -65,6 +65,9 @@ class User(shop.db.Model, UserMixin):
         else:
             shop.db.session.add(user)
             shop.db.session.commit()
+
+    def get_id(self):
+        return str(self.fs_uniquifier)
 
 
 class Role(shop.db.Model):

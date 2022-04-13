@@ -3,7 +3,7 @@ from os import getenv
 class ConfigurationFlaskLogin:
     REMEMBER_COOKIE_DURATION = 86400
     REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True
-    SESSION_PROTECTION = 'strong'
+
 
 
 class ConfigurationSesion(ConfigurationFlaskLogin):

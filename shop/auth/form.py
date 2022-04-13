@@ -39,6 +39,5 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField("Введите новый пароль",
                              validators=[InputRequired(), Length(8, 64, "Длина пароля должна быть не менее 8 символов")])
     confirm_password = PasswordField('Повторите пароль',
-                                     validators=[InputRequired(), EqualTo('password', "Пароли не совпадают"),
-                                                 Length(8, 64, "Длина пароля должна быть не менее 8 символов")])
+                                     validators=[InputRequired(), EqualTo('password', "Пароли не совпадают")])
     submit = SubmitField("Сменить пароль")
