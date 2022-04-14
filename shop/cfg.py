@@ -1,6 +1,11 @@
 from os import getenv
 
-class ConfigurationFlaskLogin:
+
+class ConfigurationRBAC:
+    RBAC_USE_WHITE = True
+
+
+class ConfigurationFlaskLogin(ConfigurationRBAC):
     REMEMBER_COOKIE_DURATION = 86400
     REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True
 

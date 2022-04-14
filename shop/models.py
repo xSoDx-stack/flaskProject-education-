@@ -7,7 +7,7 @@ import shop
 from sqlalchemy import func
 from datetime import datetime
 from flask_login import UserMixin
-
+from flask_rbac import RoleMixin
 
 user_role = shop.db.Table('user_role',
                           shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id')),
@@ -15,6 +15,7 @@ user_role = shop.db.Table('user_role',
                           )
 
 
+@shop.rbac.as_user_model
 class User(shop.db.Model, UserMixin):
     __tablename__ = 'users'
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -71,8 +72,19 @@ class User(shop.db.Model, UserMixin):
         return str(self.fs_uniquifier)
 
 
-class Role(shop.db.Model):
+class Role(shop.db.Model, RoleMixin):
     __tablename__ = 'roles'
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = shop.db.Column(shop.db.String, unique=True)
     user = shop.db.relationship('User', secondary=user_role, back_populates='role')
+
+    def add_role(self, role):
+        self.roles.append(role)
+
+    def add_roles(self, roles):
+        for role in roles:
+            self.add_role(role)
+
+    def get_roles(self):
+        for role in self.roles:
+            yield role
