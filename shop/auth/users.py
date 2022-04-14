@@ -1,7 +1,7 @@
-from flask import render_template, url_for, redirect, request, current_app
+from flask import render_template, url_for, redirect, request
 from flask_login import login_user, login_required, current_user
 
-from shop import db, ser_user, login_manager
+from shop import db
 from shop.auth.form import LogInForm, RegistrForm, RequestResetPasswordForm, ResetPasswordForm
 from shop.models import User
 from . import auth
@@ -15,9 +15,8 @@ def register():
         if request.method == 'POST' and _register.validate_on_submit():
             user = User.query.filter_by(email=_register.email.data).first()
             if not user:
-                user = user(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
-                            password=_register.confirm_password.data,
-                            fs_uniquifier=ser_user.dumps(_register.email.data))
+                user = User(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
+                            password=_register.confirm_password.data)
                 user.role_insert(user)
                 user_activate_account(user)
                 return render_template('auth/info_message/info_activate_account.html')
@@ -87,16 +86,11 @@ def reset_password(token):
         form = ResetPasswordForm()
         user = User.query.filter_by(fs_uniquifier=User.verify_token(token)).first()
         if user:
-            print(user.email)
             if form.validate_on_submit():
-                print("после нажатия кнопки")
                 user.password = form.confirm_password.data
-                user.get_generated_token()  # bad generate token
                 db.session.add(user)
                 db.session.commit()
                 return render_template('auth/pass_successfully_changed.html')
-            else:
-                print("сразу елсе проблема валидации")
     else:
         return redirect(url_for('auth.my'))
     return render_template('auth/reset_password.html', form=form)

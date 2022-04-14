@@ -6,7 +6,8 @@ from itsdangerous.exc import BadData
 import shop
 from sqlalchemy import func
 from datetime import datetime
-from flask_login import UserMixin, AnonymousUserMixin
+from flask_login import UserMixin
+
 
 user_role = shop.db.Table('user_role',
                           shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id')),
@@ -21,8 +22,8 @@ class User(shop.db.Model, UserMixin):
     name = shop.db.Column(shop.db.String(64), nullable=True)
     surname = shop.db.Column(shop.db.String(64), nullable=True)
     phone_number = shop.db.Column(shop.db.String(128), nullable=True)
-    fs_uniquifier = shop.db.Column(shop.db.String(128), unique=True)
-    active = shop.db.Column(shop.db.Boolean(), nullable=False, default=False)
+    fs_uniquifier = shop.db.Column(shop.db.String(128), default=uuid.uuid4, onupdate=uuid.uuid4)
+    active = shop.db.Column(shop.db.Boolean(), default=False)
     password_hash = shop.db.Column(shop.db.Text())
     confirmed_at = shop.db.Column(shop.db.DateTime())
     last_login_ip = shop.db.Column(shop.db.String(64))
@@ -44,7 +45,7 @@ class User(shop.db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
     def get_generated_token(self):
-        return shop.serialize.dumps(self.fs_uniquifier)  # bad generate token
+        return shop.serialize.dumps(self.fs_uniquifier)
 
     @staticmethod
     def verify_token(token):
