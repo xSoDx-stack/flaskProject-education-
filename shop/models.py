@@ -9,15 +9,43 @@ from datetime import datetime
 from flask_login import UserMixin, AnonymousUserMixin
 from flask_rbac import RoleMixin
 
-user_role = shop.db.Table('user_role',
-                          shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('users.id')),
-                          shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('roles.id'))
-                          )
+users_roles = shop.db.Table('users_roles',
+                            shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('user.id')),
+                            shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('role.id'))
+                            )
+
+roles_parents = shop.db.Table('roles_parents',
+                              shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('role.id')),
+                              shop.db.Column('parent_id', UUID(as_uuid=True), shop.db.ForeignKey('role.id'))
+                              )
+
+
+@shop.rbac.as_role_model
+class Role(shop.db.Model, RoleMixin):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True)
+    name = shop.db.Column(shop.db.String(20))
+    parents = shop.db.relationship('Role', secondary=roles_parents, primaryjoin=(id == roles_parents.c.role_id),
+                                   secondaryjoin=(id == roles_parents.c.parent_id),
+                                   backref=shop.db.backref('children', lazy='dynamic'))
+
+    def __init__(self, name):
+        RoleMixin.__init__(self)
+        self.name = name
+
+    def add_parent(self, parent):
+        self.parents.append(parent)
+
+    def add_parents(self, *parents):
+        for parent in parents:
+            self.add_parent(parent)
+
+    @staticmethod
+    def get_by_name(name):
+        return Role.query.filter_by(name=name).first()
 
 
 @shop.rbac.as_user_model
-class User(shop.db.Model, UserMixin, AnonymousUserMixin):
-    __tablename__ = 'users'
+class User(shop.db.Model, UserMixin):
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = shop.db.Column(shop.db.String, unique=False)
     name = shop.db.Column(shop.db.String(64), nullable=True)
@@ -32,7 +60,7 @@ class User(shop.db.Model, UserMixin, AnonymousUserMixin):
     update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
                                      onupdate=datetime.utcnow)
     create_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
-    role = shop.db.relationship('Role', secondary=user_role, back_populates='user')
+    roles = shop.db.relationship('Role', secondary=users_roles, back_populates='roles')
 
     @property
     def password(self):
@@ -60,25 +88,18 @@ class User(shop.db.Model, UserMixin, AnonymousUserMixin):
     def role_insert(user):
         if user.email == getenv('MAIL_USERNAME'):
             shop.db.session.add(user)
-            role = Role(name='Администратор')
+            role = Role('administrator')
             shop.db.session.add(role)
             role.user.append(user)
             shop.db.session.commit()
         else:
+            role = Role('anonymous')
+            shop.db.session.add(role)
             shop.db.session.add(user)
             shop.db.session.commit()
 
     def get_id(self):
         return str(self.fs_uniquifier)
-
-
-@shop.rbac.as_role_model
-class Role(shop.db.Model, RoleMixin):
-    __tablename__ = 'roles'
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String, unique=True)
-    user = shop.db.relationship('User', secondary=user_role, back_populates='role')
-
 
     def add_role(self, role):
         self.roles.append(role)

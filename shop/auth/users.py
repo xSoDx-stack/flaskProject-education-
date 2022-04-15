@@ -62,7 +62,6 @@ def activate_account_user(token):
 
 
 @auth.route('/main/my')
-
 @login_required
 @rbac.exempt(endpoint='auth.my')
 def my():

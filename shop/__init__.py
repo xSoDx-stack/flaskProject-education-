@@ -8,12 +8,12 @@ from flask_migrate import Migrate
 import hashlib
 from .utils import MRBAC
 
+
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
 login_manager = LoginManager()
 rbac = MRBAC()
-
 
 serialize = URLSafeTimedSerializer(secret_key=Configuration.TOKEN_SECRET_KEY, salt=Configuration.TOKEN_SALT,
                                    signer_kwargs={"digest_method": hashlib.sha512})
@@ -32,7 +32,7 @@ def create_app(config_class=Configuration):
     login_manager.login_view = 'auth.login'
     login_manager.session_protection = 'strong'
     from shop.auth import auth
-    from shop.administration import admin
+    from shop.admin import admin
     from shop.errors import error_bp
     from shop.seller import seller
     app.register_blueprint(auth, url_prefix='/auth')
