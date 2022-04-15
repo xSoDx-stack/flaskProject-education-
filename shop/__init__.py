@@ -6,13 +6,14 @@ from shop.cfg import Configuration
 from flask_mail import Mail
 from flask_migrate import Migrate
 import hashlib
-from flask_rbac import RBAC
+from .utils import MRBAC
 
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
 login_manager = LoginManager()
-rbac = RBAC()
+rbac = MRBAC()
+
 
 serialize = URLSafeTimedSerializer(secret_key=Configuration.TOKEN_SECRET_KEY, salt=Configuration.TOKEN_SALT,
                                    signer_kwargs={"digest_method": hashlib.sha512})

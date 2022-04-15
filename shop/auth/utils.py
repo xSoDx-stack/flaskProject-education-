@@ -4,6 +4,7 @@ from shop import mail
 from os import environ
 from shop.models import User
 from shop import login_manager
+from flask_rbac import RBAC
 
 
 def send_email(subject, sender, recipients, text_body, html_body):

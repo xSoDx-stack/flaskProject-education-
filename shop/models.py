@@ -6,7 +6,7 @@ from itsdangerous.exc import BadData
 import shop
 from sqlalchemy import func
 from datetime import datetime
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from flask_rbac import RoleMixin
 
 user_role = shop.db.Table('user_role',
@@ -16,7 +16,7 @@ user_role = shop.db.Table('user_role',
 
 
 @shop.rbac.as_user_model
-class User(shop.db.Model, UserMixin):
+class User(shop.db.Model, UserMixin, AnonymousUserMixin):
     __tablename__ = 'users'
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = shop.db.Column(shop.db.String, unique=False)
@@ -72,11 +72,13 @@ class User(shop.db.Model, UserMixin):
         return str(self.fs_uniquifier)
 
 
+@shop.rbac.as_role_model
 class Role(shop.db.Model, RoleMixin):
     __tablename__ = 'roles'
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = shop.db.Column(shop.db.String, unique=True)
     user = shop.db.relationship('User', secondary=user_role, back_populates='role')
+
 
     def add_role(self, role):
         self.roles.append(role)

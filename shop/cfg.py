@@ -10,7 +10,6 @@ class ConfigurationFlaskLogin(ConfigurationRBAC):
     REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True
 
 
-
 class ConfigurationSesion(ConfigurationFlaskLogin):
     SESSION_COOKIE_SECURE = True
     PERMANENT_SESSION_LIFETIME = 7200

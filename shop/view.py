@@ -1,10 +1,10 @@
 from flask import redirect, url_for, render_template
 from flask_login import login_required, logout_user
-from shop import app
-from shop import login_manager
+from shop import app, rbac
 
 
 @app.route('/')
+@rbac.exempt()
 def index():
     return render_template('index.html')
 
