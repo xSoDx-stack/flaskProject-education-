@@ -13,7 +13,6 @@ db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
 login_manager = LoginManager()
-rbac = MRBAC()
 
 serialize = URLSafeTimedSerializer(secret_key=Configuration.TOKEN_SECRET_KEY, salt=Configuration.TOKEN_SALT,
                                    signer_kwargs={"digest_method": hashlib.sha512})
@@ -27,7 +26,6 @@ def create_app(config_class=Configuration):
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
-    rbac.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     login_manager.session_protection = 'strong'

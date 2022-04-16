@@ -4,7 +4,6 @@ from shop import app, rbac
 
 
 @app.route('/')
-@rbac.exempt()
 def index():
     return render_template('index.html')
 

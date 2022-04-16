@@ -1,7 +1,7 @@
 from flask import render_template, url_for, redirect, request
 from flask_login import login_user, login_required, current_user
 
-from shop import db, rbac
+from shop import db
 from shop.auth.form import LogInForm, RegistrForm, RequestResetPasswordForm, ResetPasswordForm
 from shop.models import User
 from . import auth
@@ -9,7 +9,6 @@ from .utils import send_password_reset_email, user_activate_account
 
 
 @auth.route('/register', methods=['GET', 'POST'])
-@rbac.exempt(endpoint='auth.register')
 def register():
     if not current_user.is_authenticated:
         _register = RegistrForm()
@@ -29,7 +28,6 @@ def register():
 
 
 @auth.route('/login', methods=['GET', 'POST'])
-@rbac.exempt(endpoint='auth.login')
 def login():
     if not current_user.is_authenticated:
         _login_form = LogInForm()
@@ -46,7 +44,6 @@ def login():
 
 
 @auth.route('/confirm/<token>', methods=['GET', 'POST'])
-@rbac.exempt(endpoint='auth.activate_account_user')
 def activate_account_user(token):
     if not current_user.is_authenticated:
         user = User.query.filter(User.fs_uniquifier == User.verify_token(token)).first()
@@ -63,13 +60,11 @@ def activate_account_user(token):
 
 @auth.route('/main/my')
 @login_required
-@rbac.exempt(endpoint='auth.my')
 def my():
     return render_template('auth/user.html')
 
 
 @auth.route('/reset_password', methods=['GET', 'POST'])
-@rbac.exempt(endpoint='auth.send_password_reset')
 def send_password_reset():
     if not current_user.is_authenticated:
         res_pass = RequestResetPasswordForm()
@@ -86,7 +81,6 @@ def send_password_reset():
 
 
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
-@rbac.exempt(endpoint='auth.reset_password')
 def reset_password(token):
     if not current_user.is_authenticated:
         form = ResetPasswordForm()

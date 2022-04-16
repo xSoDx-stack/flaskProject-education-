@@ -6,45 +6,14 @@ from itsdangerous.exc import BadData
 import shop
 from sqlalchemy import func
 from datetime import datetime
-from flask_login import UserMixin, AnonymousUserMixin
-from flask_rbac import RoleMixin
+from flask_login import UserMixin
 
 users_roles = shop.db.Table('users_roles',
                             shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('user.id')),
                             shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('role.id'))
                             )
 
-roles_parents = shop.db.Table('roles_parents',
-                              shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('role.id')),
-                              shop.db.Column('parent_id', UUID(as_uuid=True), shop.db.ForeignKey('role.id'))
-                              )
 
-
-@shop.rbac.as_role_model
-class Role(shop.db.Model, RoleMixin):
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True)
-    name = shop.db.Column(shop.db.String(20))
-    parents = shop.db.relationship('Role', secondary=roles_parents, primaryjoin=(id == roles_parents.c.role_id),
-                                   secondaryjoin=(id == roles_parents.c.parent_id),
-                                   backref=shop.db.backref('children', lazy='dynamic'))
-
-    def __init__(self, name):
-        RoleMixin.__init__(self)
-        self.name = name
-
-    def add_parent(self, parent):
-        self.parents.append(parent)
-
-    def add_parents(self, *parents):
-        for parent in parents:
-            self.add_parent(parent)
-
-    @staticmethod
-    def get_by_name(name):
-        return Role.query.filter_by(name=name).first()
-
-
-@shop.rbac.as_user_model
 class User(shop.db.Model, UserMixin):
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = shop.db.Column(shop.db.String, unique=False)
@@ -101,13 +70,8 @@ class User(shop.db.Model, UserMixin):
     def get_id(self):
         return str(self.fs_uniquifier)
 
-    def add_role(self, role):
-        self.roles.append(role)
 
-    def add_roles(self, roles):
-        for role in roles:
-            self.add_role(role)
-
-    def get_roles(self):
-        for role in self.roles:
-            yield role
+class Role(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String, unique=True)
+    user = shop.db.relationship('User', secondary=users_roles, back_populates='role')
