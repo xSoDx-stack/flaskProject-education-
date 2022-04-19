@@ -29,7 +29,7 @@ class User(shop.db.Model, UserMixin):
     update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
                                      onupdate=datetime.utcnow)
     create_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
-    roles = shop.db.relationship('Role', secondary=users_roles, back_populates='roles')
+    roles = shop.db.relationship('Role', secondary=users_roles, back_populates='users')
 
     @property
     def password(self):
@@ -74,4 +74,42 @@ class User(shop.db.Model, UserMixin):
 class Role(shop.db.Model):
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = shop.db.Column(shop.db.String, unique=True)
-    user = shop.db.relationship('User', secondary=users_roles, back_populates='role')
+    users = shop.db.relationship('User', secondary=users_roles, back_populates='roles')
+
+
+class Country(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+
+
+class Type(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+
+
+class Brand(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+
+
+class Product(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+    price = shop.db.Column(shop.db.Integer())
+    discription = shop.db.Column(shop.db.Text())
+    manufacturer_country = shop.db.relationship('Country')
+    type = shop.db.relationship('Type')
+    brand = shop.db.relationship('Brand')
+    gender = shop.db.Column(shop.db.String(64))
+    material = shop.db.Column(shop.db.String(64))
+    collection = shop.db.Column(shop.db.String(128))
+    season = shop.db.Column(shop.db.String(64))
+    colour = shop.db.Column(shop.db.String(64))
+    size = shop.db.Column(shop.db.Integer())
+    length = shop.db.Column(shop.db.Integer())
+    height = shop.db.Column(shop.db.Integer())
+    width = shop.db.Column(shop.db.Integer())
+    weight = shop.db.Column(shop.db.Integer())
+    update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
+                                     onupdate=datetime.utcnow)
+    data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())

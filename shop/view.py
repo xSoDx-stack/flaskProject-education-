@@ -1,6 +1,6 @@
 from flask import redirect, url_for, render_template
 from flask_login import login_required, logout_user
-from shop import app, rbac
+from shop import app
 
 
 @app.route('/')
@@ -9,7 +9,6 @@ def index():
 
 
 @app.route('/logout')
-@login_required
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))

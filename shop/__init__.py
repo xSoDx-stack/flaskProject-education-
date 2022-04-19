@@ -6,7 +6,6 @@ from shop.cfg import Configuration
 from flask_mail import Mail
 from flask_migrate import Migrate
 import hashlib
-from .utils import MRBAC
 
 
 db = SQLAlchemy()
