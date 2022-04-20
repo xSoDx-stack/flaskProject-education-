@@ -1,5 +1,5 @@
 from flask import redirect, url_for, render_template
-from flask_login import login_required, logout_user
+from flask_login import logout_user
 from shop import app
 
 

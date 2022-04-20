@@ -34,7 +34,7 @@ class ConfigurationReCaptcha(ConfigurationMail):
 
 class ConfigurationDB(ConfigurationReCaptcha):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    database_path = 'postgres://ybzseubivewigm:e344fa47211b9ff90dbd036c0e2942a32431965cc0b26375555089fa11b879a0@ec2-52-212-228-71.eu-west-1.compute.amazonaws.com:5432/d9ec53q23du7bp'
+    database_path = getenv('DATABASE_URL')
     if database_path.startswith('postgres://'):  # This config renaming data base linck,
         database_path = database_path.replace('postgres://', 'postgresql://', 1)  # on the cloud platform PaaS Heroku
     SQLALCHEMY_DATABASE_URI = database_path
@@ -43,6 +43,6 @@ class ConfigurationDB(ConfigurationReCaptcha):
 class Configuration(ConfigurationDB):
     DEBUG = 'True'
     SECRET_KEY = getenv('SECRET_KEY')
-    TOKEN_SECRET_KEY = 'TOKEN_SECRET_KEY'
-    TOKEN_SALT = 'TOKEN_SALT'
+    TOKEN_SECRET_KEY = getenv('TOKEN_SECRET_KEY')
+    TOKEN_SALT = getenv('TOKEN_SALT')
 
