@@ -17,7 +17,8 @@ def register():
             if not user:
                 user = User(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
                             password=_register.confirm_password.data)
-                user.role_insert(user)
+                db.session.add(user)
+                db.session.commit()
                 user_activate_account(user)
                 return render_template('auth/info_message/info_activate_account.html')
             else:

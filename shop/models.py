@@ -14,6 +14,27 @@ users_roles = shop.db.Table('users_roles',
                             )
 
 
+class Role(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String, unique=True)
+    users = shop.db.relationship('User', secondary=users_roles, back_populates='roles')
+
+    @staticmethod
+    def insert_roles():
+        roles = {
+            'seller',
+            'moderator',
+            'super_moderator',
+            'admin'
+        }
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if not role:
+                role = Role(name=r)
+                shop.db.session.add(role)
+        shop.db.session.commit()
+
+
 class User(shop.db.Model, UserMixin):
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = shop.db.Column(shop.db.String, unique=False)
@@ -53,63 +74,52 @@ class User(shop.db.Model, UserMixin):
             return
         return data
 
-    @staticmethod
-    def role_insert(user):
-        if user.email == getenv('MAIL_USERNAME'):
-            shop.db.session.add(user)
-            role = Role('administrator')
-            shop.db.session.add(role)
-            role.user.append(user)
-            shop.db.session.commit()
-        else:
-            role = Role('anonymous')
-            shop.db.session.add(role)
-            shop.db.session.add(user)
-            shop.db.session.commit()
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if not self.roles:
+            if self.email == getenv('MAIL_USERNAME'):
+                self.roles.append(Role.query.filter_by(name='admin').first())
 
     def get_id(self):
         return str(self.fs_uniquifier)
 
 
-class Role(shop.db.Model):
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String, unique=True)
-    users = shop.db.relationship('User', secondary=users_roles, back_populates='roles')
 
-
-class Country(shop.db.Model):
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String(128))
-
-
-class Type(shop.db.Model):
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String(128))
-
-
-class Brand(shop.db.Model):
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String(128))
-
-
-class Product(shop.db.Model):
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String(128))
-    price = shop.db.Column(shop.db.Integer())
-    discription = shop.db.Column(shop.db.Text())
-    manufacturer_country = shop.db.relationship('Country')
-    type = shop.db.relationship('Type')
-    brand = shop.db.relationship('Brand')
-    gender = shop.db.Column(shop.db.String(64))
-    material = shop.db.Column(shop.db.String(64))
-    collection = shop.db.Column(shop.db.String(128))
-    season = shop.db.Column(shop.db.String(64))
-    colour = shop.db.Column(shop.db.String(64))
-    size = shop.db.Column(shop.db.Integer())
-    length = shop.db.Column(shop.db.Integer())
-    height = shop.db.Column(shop.db.Integer())
-    width = shop.db.Column(shop.db.Integer())
-    weight = shop.db.Column(shop.db.Integer())
-    update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
-                                     onupdate=datetime.utcnow)
-    data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
+#
+#
+# class Country(shop.db.Model):
+#     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+#     name = shop.db.Column(shop.db.String(128))
+#
+#
+# class Type(shop.db.Model):
+#     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+#     name = shop.db.Column(shop.db.String(128))
+#
+#
+# class Brand(shop.db.Model):
+#     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+#     name = shop.db.Column(shop.db.String(128))
+#
+#
+# class Product(shop.db.Model):
+#     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+#     name = shop.db.Column(shop.db.String(128))
+#     price = shop.db.Column(shop.db.Integer())
+#     discription = shop.db.Column(shop.db.Text())
+#     manufacturer_country = shop.db.relationship('Country')
+#     type = shop.db.relationship('Type')
+#     brand = shop.db.relationship('Brand')
+#     gender = shop.db.Column(shop.db.String(64))
+#     material = shop.db.Column(shop.db.String(64))
+#     collection = shop.db.Column(shop.db.String(128))
+#     season = shop.db.Column(shop.db.String(64))
+#     colour = shop.db.Column(shop.db.String(64))
+#     size = shop.db.Column(shop.db.Integer())
+#     length = shop.db.Column(shop.db.Integer())
+#     height = shop.db.Column(shop.db.Integer())
+#     width = shop.db.Column(shop.db.Integer())
+#     weight = shop.db.Column(shop.db.Integer())
+#     update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
+#                                      onupdate=datetime.utcnow)
+#     data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
