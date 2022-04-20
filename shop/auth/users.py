@@ -62,6 +62,8 @@ def activate_account_user(token):
 @auth.route('/main/my')
 @login_required
 def my():
+    for i in current_user.roles:
+        print(i.name)
     return render_template('auth/user.html')
 
 

@@ -79,9 +79,35 @@ class User(shop.db.Model, UserMixin):
         if not self.roles:
             if self.email == getenv('MAIL_USERNAME'):
                 self.roles.append(Role.query.filter_by(name='admin').first())
+                self.roles.append(Role.query.filter_by(name='seller').first())
+                self.roles.append(Role.query.filter_by(name='moderator').first())
+                self.roles.append(Role.query.filter_by(name='super_moderator').first())
 
     def get_id(self):
         return str(self.fs_uniquifier)
+
+    def can(self, role):
+        return role in self.roles
+
+    def is_administrator(self):
+        return self.can('admin')
+
+    def is_super_moderator(self):
+        return self.can('super_moderator')
+
+    def is_moderator(self):
+        return self.can('moderator')
+
+    def is_seller(self):
+        return self.can('seller')
+
+
+
+
+
+
+
+
 
 
 
