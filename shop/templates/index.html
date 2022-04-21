@@ -23,7 +23,11 @@
                     </li>
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.my') }}">Личный кабинет</a>
+                            {% if current_user.roles == [] %}
+                                <a class="nav-link" href="{{ url_for('auth.my') }}">Личный кабинет</a>
+                            {% else %}
+                                 <a class="nav-link" href="{{ url_for('auth.my') }}">Кабинет администратора</a>
+                            {% endif %}
                         </li>
                     {% endif %}
                     <li class="nav-item dropdown">
@@ -32,7 +36,6 @@
                             Link
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-                            <li><a class="dropdown-item" href="#">Админ Панель</a></li>
                             <li><a class="dropdown-item" href="#">Another action</a></li>
                             <li>
                                 <hr class="dropdown-divider">

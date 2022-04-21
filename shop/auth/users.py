@@ -1,6 +1,6 @@
 from flask import render_template, url_for, redirect, request
 from flask_login import login_user, login_required, current_user
-
+from shop.decorators import admin_required, role_required
 from shop import db
 from shop.auth.form import LogInForm, RegistrForm, RequestResetPasswordForm, ResetPasswordForm
 from shop.models import User
@@ -62,8 +62,6 @@ def activate_account_user(token):
 @auth.route('/main/my')
 @login_required
 def my():
-    for i in current_user.roles:
-        print(i.name)
     return render_template('auth/user.html')
 
 

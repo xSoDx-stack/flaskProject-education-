@@ -5,6 +5,8 @@
 {% block body %}
     {% if current_user.is_authenticated %}
         <h1>Добро пожаловать {{ current_user.name }}</h1>
-        <h2>вы являетесь  покупателем </h2>
+        <h2>вы являетесь
+            {% if current_user.roles == [] %}покупателем{% else %}
+            {% for role in current_user.roles %}{{ role.name }}#{% endfor %}{% endif %}</h2>
     {% endif %}
 {% endblock %}

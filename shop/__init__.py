@@ -7,7 +7,6 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 import hashlib
 
-
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()
@@ -40,4 +39,5 @@ def create_app(config_class=Configuration):
 
 
 app = create_app()
+
 from shop.view import *
