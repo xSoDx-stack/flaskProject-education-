@@ -1,6 +1,5 @@
 from flask import render_template, url_for, redirect, request
 from flask_login import login_user, login_required, current_user
-from shop.decorators import admin_required, role_required
 from shop import db
 from shop.auth.form import LogInForm, RegistrForm, RequestResetPasswordForm, ResetPasswordForm
 from shop.models import User

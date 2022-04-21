@@ -26,7 +26,7 @@
                             {% if current_user.roles == [] %}
                                 <a class="nav-link" href="{{ url_for('auth.my') }}">Личный кабинет</a>
                             {% else %}
-                                 <a class="nav-link" href="{{ url_for('auth.my') }}">Кабинет администратора</a>
+                                 <a class="nav-link" href="{{ url_for('admin.main') }}">Кабинет администратора</a>
                             {% endif %}
                         </li>
                     {% endif %}

@@ -1,28 +1,37 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 
 {% block head %}
-<nav class="navbar navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
-    <span class="navbar-brand mb-0 h1">Административная панель</span>
-
-    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+    <a class="navbar-brand">Административная панель</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="btn btn-outline-warning" type="button" href="{{ url_for('logout') }}">Выход</a>
+          <a class="nav-link active" aria-current="page" href="{{ url_for('index') }}">Главная</a>
         </li>
-    </ul>
-    <div class="fs-4 mb-3">
-      <button type="button" class="btn btn-warning" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{ session['name'] }}">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-          <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"></path>
-        </svg>
-      </button>
-
+        <li class="nav-item">
+          <a class="nav-link" href="#">Редактор пользователей</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Редактировать товаров</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li>
+      </ul>
     </div>
+      <span class="navbar-text">
+             <a class="nav-link active" aria-current="page" href="{{ url_for('logout') }}">Выход</a>
+      </span>
   </div>
 </nav>
 {% endblock %}
 
-{% block title %}Личный кабинет Администратора{% endblock %}
+{% block title %}Личный кабинет Администратора
+{% endblock %}
 
 {% block body %}
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
@@ -38,33 +47,31 @@
 </svg>
 
 <div class="alert alert-primary d-flex align-items-center" role="alert">
-  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:">
+      <use xlink:href="#info-fill"/></svg>
   <div>
     Зарегистрировано пользователей {{ user_info.register }}
   </div>
 </div>
 
 <div class="alert alert-success d-flex align-items-center" role="alert">
-  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:">
+      <use xlink:href="#check-circle-fill"/></svg>
   <div>
-    Пользователи с активированным акаунтом {{ user_info.activate }}
+    Пользователи с активированным аккаунтом {{ user_info.activate }}
   </div>
 </div>
 
 <div class="alert alert-warning d-flex align-items-center" role="alert">
-  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:">
+      <use xlink:href="#exclamation-triangle-fill"/></svg>
   <div>
     Пользователей с не активированными аккаунтами {{ user_info.inactivate }}
   </div>
 </div>
-
-<div class="alert alert-danger d-flex align-items-center" role="alert">
-  <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
-  <div>
-    Заблокированных пользователей {{ user_info.block }}
-  </div>
-</div>
-
-<h2>Добро пожаловать {{ session['name'] }}</h2>
-<h3>вы являетесь {{ session['role'] }}</h3>
+<h1>Добро пожаловать {{ current_user.name }}</h1>
+<h2>вы являетесь
+    {% if current_user.roles == [] %}покупателем{% else %}
+        {% for role in current_user.roles %}{{ role.name }}#{% endfor %}{% endif %}
+</h2>
 {% endblock %}
