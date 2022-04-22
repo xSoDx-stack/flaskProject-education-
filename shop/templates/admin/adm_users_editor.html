@@ -1,0 +1,43 @@
+{% extends "admin/adm_index.html" %}
+
+
+
+{% block title %}
+    Редактор пользователей
+{% endblock %}
+
+{% block body %}
+    <table class="table table-bordered table-hover border-dark">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Почта</th>
+            <th scope="col">Имя</th>
+            <th scope="col">Фамилия</th>
+            <th scope="col">Номер телефона</th>
+            <th scope="col">Вход с последнего IP</th>
+            <th scope="col">Дата обновления профиля</th>
+            <th scope="col">Дата создания профиля</th>
+            <th scope="col">Права доступа</th>
+
+        </tr>
+        </thead>
+            {% for data in users %}
+                <tbody>
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ data.email }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.surname }}</td>
+                <td>{{ data.phone_number }}</td>
+                <td>{{ data.last_login_ip }}</td>
+                <td>{{ data.update_datetime }}</td>
+                <td>{{ data.create_datetime }}</td>
+                {% for role in data.roles %}
+                    <td>{{ role.name }},</td>
+                {% endfor %}
+            </tr>
+            </tbody>
+            {% endfor %}
+    </table>
+{% endblock %}

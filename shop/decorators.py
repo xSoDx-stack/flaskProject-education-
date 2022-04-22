@@ -9,7 +9,6 @@ def role_required(role):
         def decorated_function(*args, **kwargs):
             if not current_user.cant(role):
                 abort(404)
-            print(current_user.cant('seller'))
             return f(*args, **kwargs)
         return decorated_function
     return decorator
