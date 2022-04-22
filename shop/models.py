@@ -86,20 +86,25 @@ class User(shop.db.Model, UserMixin):
     def get_id(self):
         return str(self.fs_uniquifier)
 
-    def can(self, role):
-        return role in self.roles
+    def cant(self, role):
+        answer = False
+        for i in self.roles:
+            if role in i.name:
+                answer = role in i.name
+                break
+        return answer
 
     def is_administrator(self):
-        return self.can('admin')
+        return self.cant('admin')
 
     def is_super_moderator(self):
-        return self.can('super_moderator')
+        return self.cant('super_moderator')
 
     def is_moderator(self):
-        return self.can('moderator')
+        return self.cant('moderator')
 
     def is_seller(self):
-        return self.can('seller')
+        return self.cant('seller')
 
 
 

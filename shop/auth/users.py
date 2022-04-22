@@ -61,6 +61,14 @@ def activate_account_user(token):
 @auth.route('/main/my')
 @login_required
 def my():
+    if current_user.is_administrator():
+        return redirect(url_for('admin.main'))
+    if current_user.is_moderator():
+        return redirect(url_for('admin.main'))
+    if current_user.is_super_moderator():
+        return redirect(url_for('admin.main'))
+    if current_user.is_seller():
+        return redirect(url_for('admin.main'))
     return render_template('auth/user.html')
 
 
