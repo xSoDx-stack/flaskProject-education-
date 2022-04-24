@@ -7,14 +7,15 @@
 {% endblock %}
 
 {% block body %}
-    <table class="table table-bordered table-hover border-dark">
-        <thead>
+    <table class="table table-bordered table-hover border-dark align-middle">
+        <thead class="table-info">
         <tr>
             <th scope="col">#</th>
             <th scope="col">Почта</th>
             <th scope="col">Имя</th>
             <th scope="col">Фамилия</th>
             <th scope="col">Номер телефона</th>
+            <th scope="col">Статус учётной записи</th>
             <th scope="col">Вход с последнего IP</th>
             <th scope="col">Дата обновления профиля</th>
             <th scope="col">Дата создания профиля</th>
@@ -22,22 +23,28 @@
 
         </tr>
         </thead>
-            {% for data in users %}
-                <tbody>
+        {% for data in users %}
+            <tbody class="table-secondary">
             <tr>
                 <th scope="row">{{ loop.index }}</th>
                 <td>{{ data.email }}</td>
                 <td>{{ data.name }}</td>
                 <td>{{ data.surname }}</td>
                 <td>{{ data.phone_number }}</td>
+                {% if data.active == False %}
+                    <td class="table-danger">{{ "Не подтверждена" }}</td>
+                {% elif data.active == True %}
+                    <td class="table-success">{{ "Подтверждена" }}</td>
+                {% endif %}
                 <td>{{ data.last_login_ip }}</td>
                 <td>{{ data.update_datetime }}</td>
                 <td>{{ data.create_datetime }}</td>
-                {% for role in data.roles %}
-                    <td>{{ role.name }},</td>
+                <td>{% for role in data.roles %}
+                    <li>{{ role.name }}</li>
                 {% endfor %}
+                </td>
             </tr>
             </tbody>
-            {% endfor %}
+        {% endfor %}
     </table>
 {% endblock %}

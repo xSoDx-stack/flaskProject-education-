@@ -1,7 +1,7 @@
-from flask import render_template, url_for, redirect
+from flask import render_template
 from . import admin
 from .utils import UserInfo
-from shop.decorators import role_required, admin_required
+from shop.decorators import admin_required
 from flask_login import login_required
 from shop.models import User
 

@@ -106,6 +106,10 @@ class User(shop.db.Model, UserMixin):
     def is_seller(self):
         return self.cant('seller')
 
+    def last_ip(self, ip):
+        self.last_login_ip = ip
+        shop.db.session.add(self)
+
 
 
 

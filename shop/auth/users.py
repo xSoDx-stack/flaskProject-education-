@@ -15,7 +15,7 @@ def register():
             user = User.query.filter_by(email=_register.email.data).first()
             if not user:
                 user = User(email=_register.email.data, name=_register.name.data, surname=_register.surname.data,
-                            password=_register.confirm_password.data)
+                            password=_register.confirm_password.data, current_login_ip=request.remote_addr)
                 db.session.add(user)
                 db.session.commit()
                 user_activate_account(user)
@@ -34,8 +34,14 @@ def login():
         if _login_form.validate_on_submit():
             user = User.query.filter_by(email=_login_form.email.data).first()
             if user and user.password_validation(_login_form.password.data):
-                login_user(user, _login_form.remember_me.data)
-                return redirect(url_for('auth.my'))
+                if user.active:
+                    login_user(user, _login_form.remember_me.data)
+                    current_user.last_ip(request.remote_addr)
+                    return redirect(url_for('auth.my'))
+                else:
+                    _login_form.email.errors = ["Ваша учётная запись не подтверждена, "
+                                                "выслано повторное письмо для подтверждения"]
+                    user_activate_account(user)
             else:
                 _login_form.email.errors = ["Неправильный логин или пароль"]
     else:
