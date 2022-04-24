@@ -111,17 +111,6 @@ class User(shop.db.Model, UserMixin):
         shop.db.session.add(self)
 
 
-
-
-
-
-
-
-
-
-
-#
-#
 # class Country(shop.db.Model):
 #     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 #     name = shop.db.Column(shop.db.String(128))
