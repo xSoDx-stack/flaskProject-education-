@@ -7,6 +7,9 @@ import shop
 from sqlalchemy import func
 from datetime import datetime
 from flask_login import UserMixin
+from flask_admin.contrib.sqla import ModelView
+from flask_login import current_user
+from flask import url_for, redirect
 
 users_roles = shop.db.Table('users_roles',
                             shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('user.id')),
@@ -147,3 +150,15 @@ class User(shop.db.Model, UserMixin):
 #     update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
 #                                      onupdate=datetime.utcnow)
 #     data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
+
+
+class MicroBlogModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.my'))
+
+
+shop.admin.add_view(ModelView(User, shop.db.session))
+shop.admin.add_view(ModelView(Role, shop.db.session))
