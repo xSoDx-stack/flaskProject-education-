@@ -6,15 +6,48 @@ from itsdangerous.exc import BadData
 import shop
 from sqlalchemy import func
 from datetime import datetime
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
 from flask import url_for, redirect
 
 users_roles = shop.db.Table('users_roles',
                             shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('user.id')),
-                            shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('role.id'))
-                            )
+                            shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('role.id')))
+
+
+class AnonymousUser(AnonymousUserMixin):
+
+    @property
+    def is_moderator(self):
+        return False
+
+    @property
+    def is_administrator(self):
+        return False
+
+    @property
+    def is_super_moderator(self):
+        return False
+
+    @property
+    def is_seller(self):
+        return False
+
+    @property
+    def is_authenticated(self):
+        return False
+
+    @property
+    def is_active(self):
+        return False
+
+    @property
+    def is_anonymous(self):
+        return True
+
+    def get_id(self):
+        return
 
 
 class Role(shop.db.Model):
@@ -36,6 +69,17 @@ class Role(shop.db.Model):
                 role = Role(name=r)
                 shop.db.session.add(role)
         shop.db.session.commit()
+
+    def __repr__(self):
+        return '%r' % self.name
+
+class RoleView(ModelView):
+
+    def is_accessible(self):
+        return current_user.is_administrator
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.my'))
 
 
 class User(shop.db.Model, UserMixin):
@@ -66,6 +110,7 @@ class User(shop.db.Model, UserMixin):
     def password_validation(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
     def get_generated_token(self):
         return shop.serialize.dumps(self.fs_uniquifier)
 
@@ -97,21 +142,41 @@ class User(shop.db.Model, UserMixin):
                 break
         return answer
 
+    @property
     def is_administrator(self):
         return self.cant('admin')
 
+    @property
     def is_super_moderator(self):
         return self.cant('super_moderator')
 
+    @property
     def is_moderator(self):
         return self.cant('moderator')
 
+    @property
     def is_seller(self):
         return self.cant('seller')
 
     def last_ip(self, ip):
         self.last_login_ip = ip
         shop.db.session.add(self)
+
+    def __unicode__(self):
+        return self.username
+
+    def __repr__(self):
+        return "%r" % self.email
+
+
+class UserView(ModelView):
+    column_exclude_list = ['password_hash', 'update_datetime']
+
+    def is_accessible(self):
+        return current_user.is_administrator
+
+    def inaccessible_callback(self, **kwargs):
+        return redirect(url_for('auth.my'))
 
 
 # class Country(shop.db.Model):
@@ -150,15 +215,6 @@ class User(shop.db.Model, UserMixin):
 #     update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
 #                                      onupdate=datetime.utcnow)
 #     data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
-
-
-class MicroBlogModelView(ModelView):
-    def is_accessible(self):
-        return current_user.is_authenticated
-
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('auth.my'))
-
-
-shop.admin.add_view(ModelView(User, shop.db.session))
-shop.admin.add_view(ModelView(Role, shop.db.session))
+shop.login_manager.anonymous_user = AnonymousUser
+shop.admin.add_view(UserView(User, shop.db.session))
+shop.admin.add_view(RoleView(Role, shop.db.session))
