@@ -45,4 +45,5 @@ class Configuration(ConfigurationDB):
     SECRET_KEY = getenv('SECRET_KEY')
     TOKEN_SECRET_KEY = getenv('TOKEN_SECRET_KEY')
     TOKEN_SALT = getenv('TOKEN_SALT')
+    FLASK_ADMIN_SWATCH = 'flatly'
 

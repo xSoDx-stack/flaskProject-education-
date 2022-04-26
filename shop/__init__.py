@@ -26,7 +26,8 @@ def create_app(config_class=Configuration):
     db.init_app(app)
     migrate.init_app(app, db)
     mail.init_app(app)
-    admin.init_app(app)
+    from shop.models import IndexAdminView
+    admin.init_app(app, index_view=IndexAdminView())
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
     login_manager.session_protection = 'strong'
