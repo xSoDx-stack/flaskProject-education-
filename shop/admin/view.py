@@ -1,22 +1,48 @@
-from flask import render_template
-from . import admin
-from .utils import UserInfo
-from shop.decorators import admin_required
-from flask_login import login_required
-from shop.models import User
+from flask_admin import AdminIndexView
+from flask_admin.contrib.sqla import ModelView
+from flask_admin.menu import MenuLink
+
+from shop import _admin, db, create_app
+from flask_login import current_user
+from flask import redirect, url_for
+from shop.models import Role, User
 
 
-@admin.route('/main')
-@login_required
-@admin_required
-def main():
-    user_info = UserInfo()
-    return render_template('admin/adm_index.html', user_info=user_info)
+class UserView(ModelView):
+    column_list = ['email', 'name', 'surname', 'phone_number', 'active', 'roles', 'last_login_ip', 'create_datetime',
+                   'update_datetime']
+    form_columns = ['name', 'email', 'surname', 'phone_number', 'password', 'roles']
+    column_searchable_list = ['name', 'email', 'surname', 'phone_number']
+    create_modal = True
+    edit_modal = True
+
+    def is_accessible(self):
+        return current_user.is_administrator
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.my'))
 
 
-@admin.route('/users_editor', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def users_editor():
-    users = User.query.all()
-    return render_template('admin/adm_users_editor.html', users=users)
+_admin.add_view(UserView(User, db.session))
+
+
+class IndexAdminView(AdminIndexView):
+    def is_accessible(self):
+        return current_user.is_administrator
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.my'))
+
+
+class RoleView(ModelView):
+    def is_accessible(self):
+        return current_user.is_administrator
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.my'))
+
+
+_admin.add_view(RoleView(Role, db.session))
+
+
+_admin.add_link(MenuLink(name="Выход", url='/logout'))

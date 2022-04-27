@@ -8,10 +8,7 @@ import shop
 from sqlalchemy import func
 from datetime import datetime
 from flask_login import UserMixin, AnonymousUserMixin
-from flask_admin.contrib.sqla import ModelView
-from flask_login import current_user
-from flask import url_for, redirect
-from flask_admin import AdminIndexView
+
 
 users_roles = shop.db.Table('users_roles',
                             shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('user.id')),
@@ -19,7 +16,6 @@ users_roles = shop.db.Table('users_roles',
 
 
 class AnonymousUser(AnonymousUserMixin):
-
     @property
     def is_moderator(self):
         return False
@@ -76,15 +72,6 @@ class Role(shop.db.Model):
         return '%r' % self.name
 
 
-class RoleView(ModelView):
-
-    def is_accessible(self):
-        return current_user.is_administrator
-
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('auth.my'))
-
-
 class User(shop.db.Model, UserMixin):
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = shop.db.Column(shop.db.String, unique=False)
@@ -104,7 +91,6 @@ class User(shop.db.Model, UserMixin):
 
     @hybrid_property
     def password(self):
-        # raise AttributeError("Доступ к паролю запрещён")
         return self.password_hash
 
     @password.setter
@@ -168,22 +154,6 @@ class User(shop.db.Model, UserMixin):
     def __repr__(self):
         return "%r" % self.email
 
-
-class UserView(ModelView):
-    column_list = ['email', 'name', 'surname', 'phone_number', 'roles', 'last_login_ip', 'create_datetime', 'update_datetime']
-    form_columns = ['name', 'email', 'surname', 'phone_number', 'password', 'roles']
-    column_searchable_list = ['name', 'email', 'surname', 'phone_number']
-    create_modal = True
-    edit_modal = True
-
-
-class IndexAdminView(AdminIndexView):
-    def is_accessible(self):
-        return current_user.is_administrator
-
-    def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('auth.my'))
-
 # class Country(shop.db.Model):
 #     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 #     name = shop.db.Column(shop.db.String(128))
@@ -221,7 +191,4 @@ class IndexAdminView(AdminIndexView):
 #                                      onupdate=datetime.utcnow)
 #     data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
 
-
 shop.login_manager.anonymous_user = AnonymousUser
-shop.admin.add_view(UserView(User, shop.db.session))
-shop.admin.add_view(RoleView(Role, shop.db.session))
