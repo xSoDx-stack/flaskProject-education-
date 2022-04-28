@@ -1,11 +1,10 @@
 from flask_admin import AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.menu import MenuLink
-
-from shop import _admin, db, create_app
+from shop import _admin, db
 from flask_login import current_user
 from flask import redirect, url_for
-from shop.models import Role, User
+from shop.models import Role, User, Product, Type, Country, Brand
 
 
 class UserView(ModelView):
@@ -43,6 +42,50 @@ class RoleView(ModelView):
 
 
 _admin.add_view(RoleView(Role, db.session))
+
+
+class ProductView(ModelView):
+    def is_accessible(self):
+        return current_user.is_administrator
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.my'))
+
+
+_admin.add_view(ProductView(Product, db.session))
+
+
+class CountryView(ModelView):
+    def is_accessible(self):
+        return current_user.is_administrator
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.my'))
+
+
+_admin.add_view(CountryView(Country, db.session))
+
+
+class BrandView(ModelView):
+    def is_accessible(self):
+        return current_user.is_administrator
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.my'))
+
+
+_admin.add_view(BrandView(Brand, db.session))
+
+
+class TypeView(ModelView):
+    def is_accessible(self):
+        return current_user.is_administrator
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.my'))
+
+
+_admin.add_view(TypeView(Type, db.session))
 
 
 _admin.add_link(MenuLink(name="Выход", url='/logout'))

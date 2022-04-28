@@ -154,41 +154,52 @@ class User(shop.db.Model, UserMixin):
     def __repr__(self):
         return "%r" % self.email
 
-# class Country(shop.db.Model):
-#     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     name = shop.db.Column(shop.db.String(128))
-#
-#
-# class Type(shop.db.Model):
-#     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     name = shop.db.Column(shop.db.String(128))
-#
-#
-# class Brand(shop.db.Model):
-#     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     name = shop.db.Column(shop.db.String(128))
-#
-#
-# class Product(shop.db.Model):
-#     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-#     name = shop.db.Column(shop.db.String(128))
-#     price = shop.db.Column(shop.db.Integer())
-#     discription = shop.db.Column(shop.db.Text())
-#     manufacturer_country = shop.db.relationship('Country')
-#     type = shop.db.relationship('Type')
-#     brand = shop.db.relationship('Brand')
-#     gender = shop.db.Column(shop.db.String(64))
-#     material = shop.db.Column(shop.db.String(64))
-#     collection = shop.db.Column(shop.db.String(128))
-#     season = shop.db.Column(shop.db.String(64))
-#     colour = shop.db.Column(shop.db.String(64))
-#     size = shop.db.Column(shop.db.Integer())
-#     length = shop.db.Column(shop.db.Integer())
-#     height = shop.db.Column(shop.db.Integer())
-#     width = shop.db.Column(shop.db.Integer())
-#     weight = shop.db.Column(shop.db.Integer())
-#     update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
-#                                      onupdate=datetime.utcnow)
-#     data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
+
+class Country(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+
+    def __repr__(self):
+        return '%r' % self.name
+
+
+class Type(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+
+    def __repr__(self):
+        return '%r' % self.name
+
+
+class Brand(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+
+    def __repr__(self):
+        return '%r' % self.name
+
+
+class Product(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+    price = shop.db.Column(shop.db.Integer())
+    discription = shop.db.Column(shop.db.Text())
+    manufacturer_country = shop.db.Column(UUID(), shop.db.ForeignKey('country.id'))
+    type = shop.db.Column(UUID(), shop.db.ForeignKey('type.id'))
+    brand = shop.db.Column(UUID(), shop.db.ForeignKey('brand.id'))
+    gender = shop.db.Column(shop.db.String(64))
+    material = shop.db.Column(shop.db.String(64))
+    collection = shop.db.Column(shop.db.String(128))
+    season = shop.db.Column(shop.db.String(64))
+    colour = shop.db.Column(shop.db.String(64))
+    size = shop.db.Column(shop.db.Integer())
+    length = shop.db.Column(shop.db.Integer())
+    height = shop.db.Column(shop.db.Integer())
+    width = shop.db.Column(shop.db.Integer())
+    weight = shop.db.Column(shop.db.Integer())
+    update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
+                                     onupdate=datetime.utcnow)
+    data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
+
 
 shop.login_manager.anonymous_user = AnonymousUser
