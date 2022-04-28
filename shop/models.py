@@ -9,7 +9,6 @@ from sqlalchemy import func
 from datetime import datetime
 from flask_login import UserMixin, AnonymousUserMixin
 
-
 users_roles = shop.db.Table('users_roles',
                             shop.db.Column('user_id', UUID(as_uuid=True), shop.db.ForeignKey('user.id')),
                             shop.db.Column('role_id', UUID(as_uuid=True), shop.db.ForeignKey('role.id')))
@@ -88,6 +87,7 @@ class User(shop.db.Model, UserMixin):
                                      onupdate=datetime.utcnow)
     create_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
     roles = shop.db.relationship('Role', secondary=users_roles, back_populates='users')
+    user_products = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('product.id'), nullable=True)
 
     @hybrid_property
     def password(self):
@@ -100,9 +100,8 @@ class User(shop.db.Model, UserMixin):
     def password_validation(self, password):
         return check_password_hash(self.password_hash, password)
 
-    @property
     def get_generated_token(self):
-        return shop.serialize.dumps(self.fs_uniquifier)
+        return shop.serialize.dumps(str(self.fs_uniquifier))
 
     @staticmethod
     def verify_token(token):
@@ -114,12 +113,12 @@ class User(shop.db.Model, UserMixin):
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
-        if not self.roles:
-            if self.email == getenv('MAIL_USERNAME'):
-                self.roles.append(Role.query.filter_by(name='admin').first())
-                self.roles.append(Role.query.filter_by(name='seller').first())
-                self.roles.append(Role.query.filter_by(name='moderator').first())
-                self.roles.append(Role.query.filter_by(name='super_moderator').first())
+        if self.email == getenv('MAIL_USERNAME'):
+            Role.insert_roles()
+            self.roles.append(Role.query.filter_by(name='admin').first())
+            self.roles.append(Role.query.filter_by(name='seller').first())
+            self.roles.append(Role.query.filter_by(name='moderator').first())
+            self.roles.append(Role.query.filter_by(name='super_moderator').first())
 
     def get_id(self):
         return str(self.fs_uniquifier)
@@ -158,6 +157,14 @@ class User(shop.db.Model, UserMixin):
 class Country(shop.db.Model):
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = shop.db.Column(shop.db.String(128))
+    manufacturer_country = shop.db.relationship('Product')
+
+    def __init__(self):
+        file = open('countries', 'r', encoding='utf-8')
+        while True:
+            self.name = file.readline()
+            if not self.name:
+                break
 
     def __repr__(self):
         return '%r' % self.name
@@ -166,6 +173,7 @@ class Country(shop.db.Model):
 class Type(shop.db.Model):
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = shop.db.Column(shop.db.String(128))
+    type = shop.db.relationship('Product')
 
     def __repr__(self):
         return '%r' % self.name
@@ -174,6 +182,7 @@ class Type(shop.db.Model):
 class Brand(shop.db.Model):
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = shop.db.Column(shop.db.String(128))
+    brand = shop.db.relationship('Product')
 
     def __repr__(self):
         return '%r' % self.name
@@ -184,9 +193,9 @@ class Product(shop.db.Model):
     name = shop.db.Column(shop.db.String(128))
     price = shop.db.Column(shop.db.Integer())
     discription = shop.db.Column(shop.db.Text())
-    manufacturer_country = shop.db.Column(UUID(), shop.db.ForeignKey('country.id'))
-    type = shop.db.Column(UUID(), shop.db.ForeignKey('type.id'))
-    brand = shop.db.Column(UUID(), shop.db.ForeignKey('brand.id'))
+    manufacturer_country = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('country.id'), nullable=True)
+    type = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('type.id'), nullable=True)
+    brand = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('brand.id'), nullable=True)
     gender = shop.db.Column(shop.db.String(64))
     material = shop.db.Column(shop.db.String(64))
     collection = shop.db.Column(shop.db.String(128))
@@ -200,6 +209,7 @@ class Product(shop.db.Model):
     update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
                                      onupdate=datetime.utcnow)
     data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
+    user = shop.db.relationship('User')
 
 
 shop.login_manager.anonymous_user = AnonymousUser

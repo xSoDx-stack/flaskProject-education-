@@ -8,8 +8,6 @@ from flask_migrate import Migrate
 import hashlib
 from flask_admin import Admin
 
-
-
 db = SQLAlchemy()
 migrate = Migrate()
 mail = Mail()

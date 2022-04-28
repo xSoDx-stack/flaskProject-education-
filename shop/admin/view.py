@@ -56,6 +56,9 @@ _admin.add_view(ProductView(Product, db.session))
 
 
 class CountryView(ModelView):
+    can_export = True
+    countries = Country()
+
     def is_accessible(self):
         return current_user.is_administrator
 
