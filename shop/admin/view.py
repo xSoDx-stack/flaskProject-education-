@@ -45,6 +45,13 @@ _admin.add_view(RoleView(Role, db.session))
 
 
 class ProductView(ModelView):
+    column_list = ['name', 'price', 'discription', 'country', 'type', 'brand', 'gender', 'material',
+                   'collection', 'season', 'colour', 'size', 'length', 'height', 'width', 'weight', 'user',
+                   'update_datetime', 'data_create', 'user']
+    form_columns = ['name', 'price', 'discription', 'country', 'type', 'brand', 'gender', 'material',
+                    'collection', 'season', 'colour', 'size', 'length', 'height', 'width', 'weight', 'user',
+                    'update_datetime', 'data_create', 'user']
+
     def is_accessible(self):
         return current_user.is_administrator
 
@@ -57,7 +64,6 @@ _admin.add_view(ProductView(Product, db.session))
 
 class CountryView(ModelView):
     can_export = True
-    countries = Country()
 
     def is_accessible(self):
         return current_user.is_administrator
@@ -89,6 +95,5 @@ class TypeView(ModelView):
 
 
 _admin.add_view(TypeView(Type, db.session))
-
 
 _admin.add_link(MenuLink(name="Выход", url='/logout'))

@@ -87,7 +87,8 @@ class User(shop.db.Model, UserMixin):
                                      onupdate=datetime.utcnow)
     create_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
     roles = shop.db.relationship('Role', secondary=users_roles, back_populates='users')
-    user_products = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('product.id'), nullable=True)
+    products_id = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('product.id'))
+    products = shop.db.relationship('Product', back_populates='user')
 
     @hybrid_property
     def password(self):
@@ -115,6 +116,7 @@ class User(shop.db.Model, UserMixin):
         super(User, self).__init__(**kwargs)
         if self.email == getenv('MAIL_USERNAME'):
             Role.insert_roles()
+            Country.set_countries()
             self.roles.append(Role.query.filter_by(name='admin').first())
             self.roles.append(Role.query.filter_by(name='seller').first())
             self.roles.append(Role.query.filter_by(name='moderator').first())
@@ -154,48 +156,17 @@ class User(shop.db.Model, UserMixin):
         return "%r" % self.email
 
 
-class Country(shop.db.Model):
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String(128))
-    manufacturer_country = shop.db.relationship('Product')
-
-    def __init__(self):
-        file = open('countries', 'r', encoding='utf-8')
-        while True:
-            self.name = file.readline()
-            if not self.name:
-                break
-
-    def __repr__(self):
-        return '%r' % self.name
-
-
-class Type(shop.db.Model):
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String(128))
-    type = shop.db.relationship('Product')
-
-    def __repr__(self):
-        return '%r' % self.name
-
-
-class Brand(shop.db.Model):
-    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = shop.db.Column(shop.db.String(128))
-    brand = shop.db.relationship('Product')
-
-    def __repr__(self):
-        return '%r' % self.name
-
-
 class Product(shop.db.Model):
     id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = shop.db.Column(shop.db.String(128))
     price = shop.db.Column(shop.db.Integer())
     discription = shop.db.Column(shop.db.Text())
-    manufacturer_country = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('country.id'), nullable=True)
-    type = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('type.id'), nullable=True)
-    brand = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('brand.id'), nullable=True)
+    country_id = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('country.id'))
+    country = shop.db.relationship('Country')
+    type_id = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('type.id'))
+    type = shop.db.relationship('Type')
+    brand_id = shop.db.Column(UUID(as_uuid=True), shop.db.ForeignKey('brand.id'))
+    brand = shop.db.relationship('Brand')
     gender = shop.db.Column(shop.db.String(64))
     material = shop.db.Column(shop.db.String(64))
     collection = shop.db.Column(shop.db.String(128))
@@ -209,7 +180,42 @@ class Product(shop.db.Model):
     update_datetime = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now(),
                                      onupdate=datetime.utcnow)
     data_create = shop.db.Column(shop.db.DateTime, nullable=False, server_default=func.now())
-    user = shop.db.relationship('User')
+    user = shop.db.relationship('User', back_populates='products')
+
+
+class Country(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+
+    @staticmethod
+    def set_countries():
+        with open('countries', 'r', encoding='utf-8') as file:
+            for i in file.readlines():
+                name = Country(name=i.rstrip())
+                shop.db.session.add(name)
+                print(name)
+                if not name:
+                    break
+            shop.db.session.commit()
+
+    def __repr__(self):
+        return '%r' % self.name
+
+
+class Type(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+
+    def __repr__(self):
+        return '%r' % self.name
+
+
+class Brand(shop.db.Model):
+    id = shop.db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = shop.db.Column(shop.db.String(128))
+
+    def __repr__(self):
+        return '%r' % self.name
 
 
 shop.login_manager.anonymous_user = AnonymousUser
